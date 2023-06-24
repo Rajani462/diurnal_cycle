@@ -40,6 +40,8 @@ mean_list <- foreach(dataset_name = names(file_paths), file_path = file_paths, .
   indices <- format(as.POSIXct(names(dataset), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
   indices <- as.numeric(indices)
   
+  unique_dates <- unique(as.Date(names(dataset), format = "X%Y.%m.%d.%H.%M.%S"))
+  
   ### 24 hourly mean diurnal precipitation 
   hourly_mean <- stackApply(dataset, indices, fun = mean)
   mean_dt <- as.data.frame(hourly_mean, xy = TRUE) %>%
@@ -67,8 +69,10 @@ mean_list <- foreach(dataset_name = names(file_paths), file_path = file_paths, .
     `[`(, name := factor(dataset_name)) %>%
     `[`(, variable := "intensity")
   
+  intensity_dt[!is.finite(value), value := NA]
+  
   # Calculate the frequency
-  total_available_hours <- length(indices)
+  total_available_hours <- length(unique_dates)
   frequency <- (precip_hours / total_available_hours) * 100
   
   # Create a data table with the frequency values
@@ -78,6 +82,8 @@ mean_list <- foreach(dataset_name = names(file_paths), file_path = file_paths, .
     as.data.table() %>% 
     `[`(, name := factor(dataset_name)) %>%
     `[`(, variable := "frequency")
+  
+  frequency_dt[!is.finite(value), value := NA]
   
   # Return a list of the mean, intensity, and frequency data tables
   list(mean = mean_dt, intensity = intensity_dt, frequency = frequency_dt)
@@ -128,7 +134,7 @@ library(data.table)
 library(magrittr)
 
 # Set the number of cores to use
-num_cores <- 40
+num_cores <- 40 #for R large (128GB)
 
 # Create a named vector of file paths for each dataset
 file_paths <- c(
@@ -175,10 +181,12 @@ result_list <- foreach(dataset_name = names(file_paths), file_path = file_paths,
     # Create a data table with the intensity values
     intensity_dt <- as.data.frame(intensity, xy = TRUE) %>%
       as.data.table() %>%
-      melt(., id.vars = c("x", "y"), variable.name = "date", value.name = "prec_int") %>% 
-      as.data.table() %>% 
+      data.table::melt(., id.vars = c("x", "y"), variable.name = "date") %>% 
       `[`(, name := factor(dataset_name)) %>%
-      `[`(, variable := paste0("intensity_", threshold))
+      `[`(, variable := "intensity") %>%
+      `[`(, threshold := factor(threshold))
+    
+    intensity_dt[!is.finite(value), value := NA]
     
     # Calculate the frequency
     total_available_hours <- length(indices)
@@ -187,10 +195,12 @@ result_list <- foreach(dataset_name = names(file_paths), file_path = file_paths,
     # Create a data table with the frequency values
     frequency_dt <- as.data.frame(frequency, xy = TRUE) %>%
       as.data.table() %>%
-      melt(., id.vars = c("x", "y"), variable.name = "date", value.name = "prec_freq") %>% 
-      as.data.table() %>% 
+      data.table::melt(., id.vars = c("x", "y"), variable.name = "date") %>% 
       `[`(, name := factor(dataset_name)) %>%
-      `[`(, variable := paste0("frequency_", threshold))
+      `[`(, variable := "frequency") %>%
+      `[`(, threshold := factor(threshold))
+    
+    frequency_dt[!is.finite(value), value := NA]
     
     # Return the intensity and frequency data tables as a named list
     list(intensity_dt = intensity_dt, frequency_dt = frequency_dt)

@@ -6,7 +6,7 @@ library(viridis)
 library(dplyr)
 #library(reshape)
 #library(terra)
-library(ncdf4)
+#library(ncdf4)
 library(sf)
 library(hms)
 
@@ -130,7 +130,9 @@ ggplot(spat_seas[variable == "mean"]) +
   facet_grid(season~name) + 
   scale_x_continuous(expand = c(0, 0)) + 
   labs(x = "", y = "", fill = "Mean\n precipitation \n (mm/hr)") + 
-  theme_small
+  theme_small + 
+  theme(legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.5, "cm"),
+        legend.key.height = unit(0.9, 'cm'))
 
 ggsave("./projects/kenya_example/results/05c_mean_seasonal.png", width = 8.8, height = 6.3,, 
        units = "in", dpi = 600)
@@ -143,34 +145,40 @@ summary(spat_seas[variable == "intensity"])
 ggplot(spat_seas[variable == "intensity"]) + 
   geom_raster(aes(lon, lat, fill = mean_value)) +
   scale_fill_binned(type = "viridis", direction = -1, 
-                    breaks = c(0.5, 1, 2, 3, 4, 5, 6), show.limits = TRUE) + 
+                    breaks = c(0.5, 1, 2, 3, 4, 5, 6, 10), show.limits = TRUE) + 
   borders(colour = "black") +
   coord_cartesian(xlim = c(min(spat_seas$lon), max(spat_seas$lon)), 
                   ylim = c(min(spat_seas$lat), max(spat_seas$lat))) + 
   facet_grid(season~name) + 
   scale_x_continuous(expand = c(0, 0)) + 
   labs(x = "", y = "", fill = "Mean \n intensity (mm/hr)") + 
-  theme_small
+  theme_small + 
+  theme(legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.5, "cm"),
+        legend.key.height = unit(0.9, 'cm'))
 
 ggsave("./projects/kenya_example/results/05c_intensity_seasonal.png", width = 8.8, height = 6.3,, 
        units = "in", dpi = 600)
 
+spat_seas[variable == "intensity" & mean_value >= 8]
 
 ## mean frequency
 
 summary(spat_seas[variable == "frequency"])
+spat_seas[variable == "frequency" & mean_value >= 50]
 
 ggplot(spat_seas[variable == "frequency"]) + 
   geom_raster(aes(lon, lat, fill = mean_value)) +
   scale_fill_binned(type = "viridis", direction = -1, 
-                    breaks = c(0.2, 0.4, 0.8, 1, 1.5, 2, 2.5), show.limits = TRUE) + 
+                    breaks = c(2, 5, 10, 15, 20, 30, 40, 50, 60), show.limits = TRUE) + 
   borders(colour = "black") +
   coord_cartesian(xlim = c(min(spat_seas$lon), max(spat_seas$lon)), 
                   ylim = c(min(spat_seas$lat), max(spat_seas$lat))) + 
   facet_grid(season~name) + 
   scale_x_continuous(expand = c(0, 0)) + 
   labs(x = "", y = "", fill = "Mean \n frequency (%)") + 
-  theme_small
+  theme_small + 
+  theme(legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.5, "cm"),
+        legend.key.height = unit(0.9, 'cm'))
 
 ggsave("./projects/kenya_example/results/05c_frequency_seasonal.png", width = 8.8, height = 6.3,, 
        units = "in", dpi = 600)
@@ -180,8 +188,8 @@ ggsave("./projects/kenya_example/results/05c_frequency_seasonal.png", width = 8.
 
 peak_hour <- mean_int_freq[, .SD[which.max(value)], by = .(lat, lon, name, variable, season)]
 
-levels(peak_hour$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
-levels(peak_hour$season) <- c("JF", "MAM", "JJAS", "OND")
+#levels(peak_hour$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
+#levels(peak_hour$season) <- c("JF", "MAM", "JJAS", "OND")
 
 ## peak hour of mean
 
