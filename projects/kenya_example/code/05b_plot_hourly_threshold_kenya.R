@@ -10,6 +10,7 @@ library(ncdf4)
 library(sf)
 library(hms)
 library(forcats)
+library(ggh4x)
 
 #source('./source/libs.R')
 source('./source/themes.R')
@@ -60,7 +61,7 @@ summary(spat_mean_dt[variable == "mean"])
 
 ggplot(spat_mean_dt[variable == "mean"]) + 
   geom_raster(aes(lon, lat, fill = mean_value)) +
-  scale_fill_binned(type = "viridis", direction = -1, 
+  scale_fill_binned(type = "viridis", option = "B", direction = -1, 
                     breaks = c(0.02, 0.04, 0.06, 0.08, 0.1, 0.5), show.limits = TRUE) + 
   borders(colour = "black") +
   coord_cartesian(xlim = c(min(spat_mean_dt$lon), max(spat_mean_dt$lon)), 
@@ -68,13 +69,14 @@ ggplot(spat_mean_dt[variable == "mean"]) +
   facet_grid(threshold~name) + 
   scale_x_continuous(expand = c(0, 0)) + 
   labs(x = "", y = "", fill = "Mean\n precipitation \n (mm/hr)") + 
-  theme_small + 
-  theme(legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.5, "cm"),
-        legend.key.height = unit(0.9, 'cm')) + 
-  facet_grid(threshold~fct_relevel(name,  "IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5"))
+  facet_grid(threshold~fct_relevel(name,  "IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")) + 
+  theme_generic + 
+  theme(strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'), 
+        legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.5, "cm"),
+        legend.key.height = unit(0.9, 'cm'))
 
-
-ggsave("./projects/kenya_example/results/05b_mean_threshold.png", width = 8.8, height = 6.3,, 
+ggsave("./projects/kenya_example/results/05b_spat_mean_threshold.png", width = 9.5, height = 5.3, 
        units = "in", dpi = 600)
 
 
@@ -83,7 +85,7 @@ summary(spat_mean_dt[variable == "intensity"])
 
 ggplot(spat_mean_dt[variable == "intensity"]) + 
   geom_raster(aes(lon, lat, fill = mean_value)) +
-  scale_fill_binned(type = "viridis", direction = -1, 
+  scale_fill_binned(type = "viridis", option = "B", direction = -1, 
                     breaks = c(0.5, 1, 2, 3, 4, 5, 6, 7), show.limits = TRUE) + 
   borders(colour = "black") +
   coord_cartesian(xlim = c(min(spat_mean_dt$lon), max(spat_mean_dt$lon)), 
@@ -91,13 +93,14 @@ ggplot(spat_mean_dt[variable == "intensity"]) +
   facet_grid(threshold~name) + 
   scale_x_continuous(expand = c(0, 0)) + 
   labs(x = "", y = "", fill = "Mean \n intensity (mm/hr)") + 
-  theme_small + 
-  theme(legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.5, "cm"),
-        legend.key.height = unit(0.9, 'cm')) + 
-  facet_grid(threshold~fct_relevel(name,  "IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5"))
+  facet_grid(threshold~fct_relevel(name,  "IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")) + 
+  theme_generic + 
+  theme(strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'), 
+        legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.5, "cm"),
+        legend.key.height = unit(0.9, 'cm'))
 
-
-ggsave("./projects/kenya_example/results/05b_intensity_threshold.png", width = 8.8, height = 6.3,, 
+ggsave("./projects/kenya_example/results/05b_spat_intens_threshold.png", width = 9.5, height = 5.3, 
        units = "in", dpi = 600)
 
 spat_mean_dt[variable == "intensity" & mean_value >= 7]
@@ -108,21 +111,21 @@ spat_mean_dt[variable == "frequency" & mean_value >= 60]
 
 ggplot(spat_mean_dt[variable == "frequency"]) + 
   geom_raster(aes(lon, lat, fill = mean_value)) +
-  scale_fill_binned(type = "viridis", direction = -1, 
-                    breaks = c(2, 5, 10, 15, 20, 30, 40, 50), show.limits = TRUE) + 
+  scale_fill_binned(type = "viridis", option = "B",  direction = -1, 
+                    breaks = c(1, 2, 5, 10, 15, 20, 30, 40, 50), show.limits = TRUE) + 
   borders(colour = "black") +
   coord_cartesian(xlim = c(min(spat_mean_dt$lon), max(spat_mean_dt$lon)), 
                   ylim = c(min(spat_mean_dt$lat), max(spat_mean_dt$lat))) + 
   facet_grid(threshold~name) + 
   scale_x_continuous(expand = c(0, 0)) + 
-  labs(x = "", y = "", fill = "Mean \n frequency (%)") + 
-  theme_small + 
-  theme(legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.5, "cm"),
-        legend.key.height = unit(0.9, 'cm')) + 
-  facet_grid(threshold~fct_relevel(name,  "IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5"))
+  labs(x = "", y = "", fill = "Mean \n frequency (%)") + facet_grid(threshold~fct_relevel(name,  "IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")) + 
+  theme_generic + 
+  theme(strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'), 
+        legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.5, "cm"),
+        legend.key.height = unit(0.9, 'cm'))
 
-
-ggsave("./projects/kenya_example/results/05b_frequency_threshold.png", width = 8.8, height = 6.3,, 
+ggsave("./projects/kenya_example/results/05b_spat_freq_threshold.png", width = 9.5, height = 5.3, 
        units = "in", dpi = 600)
 
 
@@ -140,6 +143,7 @@ peak_hour_list <- lapply(dat_lst_list, function(dt) {
 peak_hour_dt <- rbindlist(peak_hour_list)
 levels(peak_hour_dt$name) <- c("CMORPH", "IMERG", "PERSIANN", "ERA5", "GSMaP")
 # peak_hour_dt$name <- ordered(peak_hour_dt$name, levels = c("CMORPH", "IMERG", "PERSIANN", "ERA5", "GSMaP"))
+levels(peak_hour_dt$threshold) <- c("0.1 (mm/hr)", "0.5 (mm/hr)", "1 (mm/hr)")
 
 ### mean 
 
@@ -152,11 +156,14 @@ ggplot(peak_hour_dt[variable  == "mean"]) +
   facet_grid(threshold~name) +  
   scale_x_continuous(expand = c(0, 0)) + 
   labs(x = "", y = "", fill = "Peak hour of\n mean") + 
-  theme_small + 
-  facet_grid(threshold~fct_relevel(name,  "IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5"))
+  facet_grid(threshold~fct_relevel(name,  "IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")) + 
+  theme_generic + 
+  theme(strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'), 
+        legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.5, "cm"),
+        legend.key.height = unit(0.9, 'cm'))
 
-
-ggsave("./projects/kenya_example/results/05b_peak_int_threshold.png", width = 8.5, height = 5.3, 
+ggsave("./projects/kenya_example/results/05b_spat_peak_mean_threshold.png", width = 9.5, height = 5.3, 
        units = "in", dpi = 600)
 
 
@@ -171,11 +178,14 @@ ggplot(peak_hour_dt[variable  == "intensity"]) +
   facet_grid(threshold~name) +  
   scale_x_continuous(expand = c(0, 0)) + 
   labs(x = "", y = "", fill = "Peak hour of\n intensity") + 
-  theme_small + 
-  facet_grid(threshold~fct_relevel(name,  "IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5"))
+  facet_grid(threshold~fct_relevel(name,  "IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")) + 
+  theme_generic + 
+  theme(strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'), 
+        legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.5, "cm"),
+        legend.key.height = unit(0.9, 'cm'))
 
-
-ggsave("./projects/kenya_example/results/05b_peak_int_threshold.png", width = 8.5, height = 5.3, 
+ggsave("./projects/kenya_example/results/05b_spat_peak_intens_threshold.png", width = 9.5, height = 5.3, 
        units = "in", dpi = 600)
 
 
@@ -189,12 +199,15 @@ ggplot(peak_hour_dt[variable  == "frequency"]) +
                   ylim = c(min(peak_hour_dt$lat), max(peak_hour_dt$lat))) + 
   facet_grid(threshold~name) +  
   scale_x_continuous(expand = c(0, 0)) + 
-  labs(x = "", y = "", fill = "Peak hour of frequency") + 
-  theme_small + 
-  facet_grid(threshold~fct_relevel(name,  "IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5"))
+  labs(x = "", y = "", fill = "Peak hour of\n frequency") + 
+  facet_grid(threshold~fct_relevel(name,  "IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")) + 
+  theme_generic + 
+  theme(strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'), 
+        legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.5, "cm"),
+        legend.key.height = unit(0.9, 'cm'))
 
-
-ggsave("./projects/kenya_example/results/05b_peak_freq_threshold.png", width = 8.5, height = 5.3, 
+ggsave("./projects/kenya_example/results/05b_spat_peak_freq_threshold.png", width = 9.5, height = 5.3, 
        units = "in", dpi = 600)
 
 
@@ -205,10 +218,17 @@ mean_int_freq_list <- lapply(dat_lst_list, function(dt) {
 })
 
 mean_int_freq_24h <- rbindlist(mean_int_freq_list)
-levels(mean_int_freq_24h$name) <- c("CMORPH", "IMERG", "PERSIANN", "ERA5", "GSMaP")
+
+# Change the order of levels
+mean_int_freq_24h$name <- reorder(mean_int_freq_24h$name, match(mean_int_freq_24h$name, c("imerg", "gsmap", "cmorph", "persiann", "era5")))
+# Change names to specific format
+levels(mean_int_freq_24h$name) <- ifelse(levels(mean_int_freq_24h$name) == "gsmap", "GSMaP", toupper(levels(mean_int_freq_24h$name)))
+
+# Check the new order of levels
+levels(mean_int_freq_24h$name)
+
 levels(mean_int_freq_24h$variable) <- c("Mean (mm/hr)", "Intensity (mm/hr)", "Frequency (%)")
 levels(mean_int_freq_24h$threshold) <- c("0.1 (mm/hr)", "0.5 (mm/hr)", "1 (mm/hr)")
-
 
 str(mean_int_freq_24h)
 
@@ -218,14 +238,18 @@ ggplot(mean_int_freq_24h, aes(hour, mean_value, col = name, group = name)) +
   geom_point() + 
   geom_line() + 
   labs(x ="Hour (LST)", y = "") + 
-  facet_grid(variable~threshold, scales = "free_y") +
-  # ggh4x::facet_grid2(variable~threshold, scales = "free_y", independent = "y") + 
-  theme_small + 
-  theme(legend.title = element_blank(), legend.direction = "horizontal", 
-        legend.position = "bottom")
+  facet_grid(variable~threshold, scales = "free_y") + 
+  #facet_grid(threshold~fct_relevel(name,  "IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5"))
+  #ggh4x::facet_grid2(variable~threshold, scales = "free_y", independent = "y") + 
+  theme_generic + 
+  theme(legend.title = element_blank(), strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'))
 
-ggsave("./projects/kenya_example/results/05b_diurnal_mean_freq_inten_LST_threshold.png",
+ggsave("./projects/kenya_example/results/05b_lineplot_mean_freq_inten_LST_threshold.png",
        width = 8.9, height = 5.6, units = "in", dpi = 600)
+
+
+##################################################################################
 
 #same as above butchange y axix to see the differences
 library(ggh4x)
