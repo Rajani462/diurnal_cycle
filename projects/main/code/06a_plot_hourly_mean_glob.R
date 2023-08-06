@@ -53,7 +53,7 @@ ggplot(spat_mean_dt) +
         legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.4, "cm"),
         legend.key.height = unit(1.0, 'cm'))
 
-ggsave("./projects/main/results/06a_spat_mean_threshold_0.1.png", width = 9.5, height = 5.3, 
+ggsave("./projects/main/results/06a_spat_mean.png", width = 9.5, height = 5.3, 
        units = "in", dpi = 600)
 
 
@@ -152,8 +152,9 @@ ggplot(peak_hour_dt) +
         legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.5, "cm"),
         legend.key.height = unit(0.9, 'cm'))
 
-ggsave("./projects/main/results/06a_plot_spat_peak_hour_mean_threshold_0.1.png", width = 10.5, height = 6.9, 
+ggsave("./projects/main/results/06a_plot_spat_peak_hour_mean.png", width = 10.5, height = 6.9, 
        units = "in", dpi = 600)
+
 
 
 ### seasonal
@@ -180,7 +181,7 @@ ggplot(peak_hour_seas_dt) +
         legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.5, "cm"),
         legend.key.height = unit(0.9, 'cm'))
 
-ggsave("./projects/main/results/06a_plot_spat_peak_hour_mean_threshold_0.1_season.png", width = 10.5, height = 7.9, 
+ggsave("./projects/main/results/06a_plot_spat_peak_hour_mean_season.png", width = 10.5, height = 7.9, 
        units = "in", dpi = 600)
 
 ###############################################################
