@@ -1,0 +1,16 @@
+projects/kenya_examples/data
+projects/kenya_examples/results
+~/rajani/diurnal_cycle/projects/main/data
+~/rajani/diurnal_cycle/projects/main/results
+data/
+results/
+data_files/
+output/
+logs/
+~/rajani/diurnal_cycle/projects/kenya_example/data/
+
+
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
