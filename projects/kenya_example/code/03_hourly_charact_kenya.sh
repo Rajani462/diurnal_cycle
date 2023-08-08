@@ -65,3 +65,34 @@ cdo dhourmean trial_persian_2001_jan_missremov.nc trial_hourmean_persian_2001_ja
 cdo setctomiss,-99 persiann_hour_kenya_2001_20_regrid.nc trail_persian_missing.nc
 cdo dhourmean trial_persian_2001_jan_missremov.nc trial_hourmean_persian_2001_jan_missremov.nc
 cdo dhourmean trial_jan_masked_precipitation.nc trial_hourmean_jan_masked_precipitation.nc
+
+
+
+#####################################################################################
+
+# dhourmean for different threshold
+cd ~/rajani/diurnal_cycle/projects/kenya_example/data/
+
+
+cdo gec,0.2 gsmap_hour_kenya_2015_20.nc trl_mask.nc
+cdo mul gsmap_hour_kenya_2015_20.nc trl_mask.nc trl_masked_input_file.nc
+cdo dhourmean trl_masked_input_file.nc gsmap_hourmean_precip_greater_than_0.2mm.nc
+
+
+
+cdo -dhourmean -expr,'tp_gt_0_2mm = (tp > 0.2) * tp' gsmap_hour_kenya_2015_20.nc trl2_gsmap_hourmean_precip_greater_than_0.2mm.nc
+
+#cdo -dhourmean -mul gsmap_hour_kenya_2015_20.nc <(cdo gec,0.2 gsmap_hour_kenya_2015_20.nc) trl_gsmap_hourmean_precip_greater_than_0.2mm.nc
+
+#cdo -dhourmean -mul gsmap_hour_kenya_2015_20.nc <(cdo gec,0.2 gsmap_hour_kenya_2015_20.nc trl_mask.nc) trl2_gsmap_hourmean_precip_greater_than_0.2mm.nc
+
+#cdo -dhourmean -mul gsmap_hour_kenya_2015_20.nc gec,0.2 gsmap_hour_kenya_2015_20.nc hourly_charact/gsmap_hourmean_precip_greater_than_0.2mm.nc
+
+#cdo -dhourmean -ifthen -gec,0.2 gsmap_hour_kenya_2015_20.nc gsmap_hour_kenya_2015_20.nc trl_gsmap_hourmean_precip_greater_than_0.2mm.nc
+
+
+cdo -dhourmean -mul gsmap_hour_kenya_2015_20.nc -gec,0.2 temp_file.nc
+mv temp_file.nc hourly_charact/gsmap_hourmean_precip_greater_than_0.2mm.nc
+
+
+
