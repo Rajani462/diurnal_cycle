@@ -19,13 +19,15 @@ source('./source/palettes.R')
 
 ## read the data sets -------------------------------
 
-dat_thres_list <- readRDS("./projects/kenya_example/data/output/diurnal_int_freq_thres_list.RDS")
+#dat_thres_list <- readRDS("./projects/kenya_example/data/output/diurnal_int_freq_thres_list.RDS")
+dat_thres_list_new <- readRDS("./projects/kenya_example/data/output/diurnal_int_freq_thres_list_new.RDS")
 
 
 ## Pre-process -----------------------------------------------
 
 #dat_list <- lapply(dat_thres_list, rbindlist)
-dat_list <- dat_thres_list
+#dat_list <- dat_thres_list
+dat_list <- unlist(dat_thres_list_new, recursive=F) %>% unlist(, recursive=F)
 
 # change the time to LST 
 # converting the time from utc to LST for a list of data.tables
@@ -53,8 +55,9 @@ levels(spat_mean_dt$name)
 # spat_mean_dt$name <- fct_recode(spat_mean_dt$name, CMORPH = "cmorph", IMERG = "imerg", PERSIANN = "persiann", 
 #            ERA5 = "era5", GSMaP = "gsmap")
 
-levels(spat_mean_dt$name) <- c("CMORPH", "IMERG", "PERSIANN", "ERA5", "GSMaP")
-levels(spat_mean_dt$threshold) <- c("0.1 (mm/hr)", "0.5 (mm/hr)", "1 (mm/hr)")
+#levels(spat_mean_dt$name) <- c("CMORPH", "IMERG", "PERSIANN", "ERA5", "GSMaP")
+levels(spat_mean_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
+levels(spat_mean_dt$threshold) <- c("0.1 (mm/hr)", "0.2 mm/hr",  "0.5 (mm/hr)", "1 (mm/hr)")
 
 # mean precipitation
 summary(spat_mean_dt[variable == "mean"])
@@ -131,6 +134,7 @@ ggsave("./projects/kenya_example/results/05b_spat_freq_threshold.png", width = 9
 
 
 # Estimate the peak hour of data.tables is called "data_list" -----------------
+
 peak_hour_list <- lapply(dat_lst_list, function(dt) {
   # Modify the code to use the data.table "int_freq"
   peak_hour <- dt[, .SD[which.max(value)], by = .(lat, lon, name, variable, threshold)]
@@ -141,9 +145,11 @@ peak_hour_list <- lapply(dat_lst_list, function(dt) {
 ## peak hour of intensity and frequency plot -----------------------------------
 
 peak_hour_dt <- rbindlist(peak_hour_list)
-levels(peak_hour_dt$name) <- c("CMORPH", "IMERG", "PERSIANN", "ERA5", "GSMaP")
+levels(peak_hour_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
+
+#levels(peak_hour_dt$name) <- c("CMORPH", "IMERG", "PERSIANN", "ERA5", "GSMaP")
 # peak_hour_dt$name <- ordered(peak_hour_dt$name, levels = c("CMORPH", "IMERG", "PERSIANN", "ERA5", "GSMaP"))
-levels(peak_hour_dt$threshold) <- c("0.1 (mm/hr)", "0.5 (mm/hr)", "1 (mm/hr)")
+levels(peak_hour_dt$threshold) <- c("0.1 (mm/hr)", "0.2 (mm/hr)", "0.5 (mm/hr)", "1 (mm/hr)")
 
 ### mean 
 
@@ -219,23 +225,24 @@ mean_int_freq_list <- lapply(dat_lst_list, function(dt) {
 
 mean_int_freq_24h <- rbindlist(mean_int_freq_list)
 
-# Change the order of levels
-mean_int_freq_24h$name <- reorder(mean_int_freq_24h$name, match(mean_int_freq_24h$name, c("imerg", "gsmap", "cmorph", "persiann", "era5")))
-# Change names to specific format
-levels(mean_int_freq_24h$name) <- ifelse(levels(mean_int_freq_24h$name) == "gsmap", "GSMaP", toupper(levels(mean_int_freq_24h$name)))
-
-# Check the new order of levels
+# # Change the order of levels
+# mean_int_freq_24h$name <- reorder(mean_int_freq_24h$name, match(mean_int_freq_24h$name, c("imerg", "gsmap", "cmorph", "persiann", "era5")))
+# # Change names to specific format
+# levels(mean_int_freq_24h$name) <- ifelse(levels(mean_int_freq_24h$name) == "gsmap", "GSMaP", toupper(levels(mean_int_freq_24h$name)))
+# 
+# # Check the new order of levels
 levels(mean_int_freq_24h$name)
 
-levels(mean_int_freq_24h$variable) <- c("Mean (mm/hr)", "Intensity (mm/hr)", "Frequency (%)")
-levels(mean_int_freq_24h$threshold) <- c("0.1 (mm/hr)", "0.5 (mm/hr)", "1 (mm/hr)")
+levels(mean_int_freq_24h$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
+levels(mean_int_freq_24h$variable) <- c("Mean (mm/hr)", "Frequency (%)", "Intensity (mm/hr)")
+levels(mean_int_freq_24h$threshold) <- c("0.1 (mm/hr)", "0.2 (mm/hr)", "0.5 (mm/hr)", "1 (mm/hr)")
 
 str(mean_int_freq_24h)
 
 ## mean, intensity and frequency together
 
 ggplot(mean_int_freq_24h, aes(hour, mean_value, col = name, group = name)) + 
-  geom_point() + 
+  geom_point(size = 0.85) + 
   geom_line() + 
   labs(x ="Hour (LST)", y = "") + 
   facet_grid(variable~threshold, scales = "free_y") + 

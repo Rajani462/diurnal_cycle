@@ -8,7 +8,7 @@ data_files/
 output/
 logs/
 ~/rajani/diurnal_cycle/projects/kenya_example/data/
-
+/log
 
 .Rproj.user
 .Rhistory

@@ -1,0 +1,6 @@
+
+# PERSIANN data at hourly scale at the global level downloaded from https://chrsdata.eng.uci.edu/ in netcdf format (they sned it to email)
+
+# CMORPH data at hourly scale at the global level downloaded from https://chrsdata.eng.uci.edu/ in netcdf format (they sned it to email)
+
+# GSMAP data at hourly scale at the global level downloaded from https://chrsdata.eng.uci.edu/ in netcdf format (they sned it to email)

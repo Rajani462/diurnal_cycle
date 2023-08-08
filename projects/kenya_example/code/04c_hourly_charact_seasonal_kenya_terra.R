@@ -30,6 +30,8 @@ cmorph_ond <- cmorph[[ond]]
 indices <- format(as.POSIXct(time(cmorph_jf), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
 
+unique_dates <- unique(as.Date(time(cmorph_jf), format = "X%Y.%m.%d.%H.%M.%S"))
+
 ### 24 hourly mean diurnal precipitation
 
 cmorph_hourly_mean_jf <- tapp(cmorph_jf, indices, fun = mean)
@@ -64,7 +66,7 @@ cmorph_jf_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_jf <- length(indices)
+total_available_hours_jf <- length(unique_dates)
 cmorph_jf_frequency <- (precip_hours_jf / total_available_hours_jf) * 100
 
 cmorph_jf_freq_dt <- as.data.frame(cmorph_jf_frequency, xy = TRUE) %>%
@@ -83,6 +85,8 @@ cmorph_jf_freq_dt[!is.finite(prec_freq), prec_freq := NA]
 #get the date from the names of the layers and extract the month
 indices <- format(as.POSIXct(time(cmorph_mam), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
+
+unique_dates <- unique(as.Date(time(cmorph_mam), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation 
 cmorph_hourly_mean_mam <- tapp(cmorph_mam, indices, fun = mean)
@@ -116,7 +120,7 @@ cmorph_mam_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_mam <- length(indices)
+total_available_hours_mam <- length(unique_dates)
 cmorph_mam_frequency <- (precip_hours_mam / total_available_hours_mam) * 100
 
 cmorph_mam_freq_dt <- as.data.frame(cmorph_mam_frequency, xy = TRUE) %>%
@@ -134,6 +138,8 @@ cmorph_mam_freq_dt[!is.finite(prec_freq), prec_freq := NA]
 
 indices <- format(as.POSIXct(time(cmorph_jjas), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
+
+unique_dates <- unique(as.Date(time(cmorph_jjas), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation
 cmorph_hourly_mean_jjas <- tapp(cmorph_jjas, indices, fun = mean)
@@ -171,7 +177,7 @@ cmorph_jjas_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_jjas <- length(indices)
+total_available_hours_jjas <- length(unique_dates)
 cmorph_jjas_frequency <- (precip_hours_jjas / total_available_hours_jjas) * 100
 
 cmorph_jjas_freq_dt <- as.data.frame(cmorph_jjas_frequency, xy = TRUE) %>%
@@ -191,6 +197,7 @@ cmorph_jjas_freq_dt[!is.finite(prec_freq), prec_freq := NA]
 indices <- format(as.POSIXct(time(cmorph_ond), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
 
+unique_dates <- unique(as.Date(time(cmorph_ond), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation
 cmorph_hourly_mean_ond <- tapp(cmorph_ond, indices, fun = mean)
@@ -228,7 +235,7 @@ cmorph_ond_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_ond <- length(indices)
+total_available_hours_ond <- length(unique_dates)
 cmorph_ond_frequency <- (precip_hours_ond / total_available_hours_ond) * 100
 
 cmorph_ond_freq_dt <- as.data.frame(cmorph_ond_frequency, xy = TRUE) %>%
@@ -281,10 +288,14 @@ imerg_jjas <- subset(imerg, which(m %in% c(6, 7, 8, 9)))
 imerg_ond <- subset(imerg, which(m %in% c(10, 11, 12)))
 
 
+imerg_jf_cop <- brick(imerg[[5000:78000]])
+
 ### for JF
 #get the date from the names of the layers and extract the month
 indices <- format(as.POSIXct(names(imerg_jf), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
+
+unique_dates <- unique(as.Date(names(imerg_jf), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation
 
@@ -323,7 +334,7 @@ imerg_jf_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_jf <- length(indices)
+total_available_hours_jf <- length(unique_dates)
 imerg_jf_frequency <- (precip_hours_jf / total_available_hours_jf) * 100
 
 imerg_jf_freq_dt <- as.data.frame(imerg_jf_frequency, xy = TRUE) %>%
@@ -344,6 +355,8 @@ imerg_jf_freq_dt[!is.finite(prec_freq), prec_freq := NA]
 #get the date from the names of the layers and extract the month
 indices <- format(as.POSIXct(names(imerg_mam), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
+
+unique_dates <- unique(as.Date(names(imerg_mam), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation
 
@@ -381,7 +394,7 @@ imerg_mam_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_mam <- length(indices)
+total_available_hours_mam <- length(unique_dates)
 imerg_mam_frequency <- (precip_hours_mam / total_available_hours_mam) * 100
 
 imerg_mam_freq_dt <- as.data.frame(imerg_mam_frequency, xy = TRUE) %>%
@@ -402,6 +415,8 @@ imerg_mam_freq_dt[!is.finite(prec_freq), prec_freq := NA]
 #get the date from the names of the layers and extract the month
 indices <- format(as.POSIXct(names(imerg_jjas), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
+
+unique_dates <- unique(as.Date(names(imerg_jjas), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation
 
@@ -438,7 +453,7 @@ imerg_jjas_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_jjas <- length(indices)
+total_available_hours_jjas <- length(unique_dates)
 imerg_jjas_frequency <- (precip_hours_jjas / total_available_hours_jjas) * 100
 
 imerg_jjas_freq_dt <- as.data.frame(imerg_jjas_frequency, xy = TRUE) %>%
@@ -459,6 +474,8 @@ imerg_jjas_freq_dt[!is.finite(prec_freq), prec_freq := NA]
 #get the date from the names of the layers and extract the month
 indices <- format(as.POSIXct(names(imerg_ond), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
+
+unique_dates <- unique(as.Date(names(imerg_ond), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation
 
@@ -495,7 +512,7 @@ imerg_ond_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_ond <- length(indices)
+total_available_hours_ond <- length(unique_dates)
 imerg_ond_frequency <- (precip_hours_ond / total_available_hours_ond) * 100
 
 imerg_ond_freq_dt <- as.data.frame(imerg_ond_frequency, xy = TRUE) %>%
@@ -556,6 +573,8 @@ gsmap_ond <- subset(gsmap, which(m %in% c(10, 11, 12)))
 indices <- format(as.POSIXct(names(gsmap_jf), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
 
+unique_dates <- unique(as.Date(names(gsmap_jf), format = "X%Y.%m.%d.%H.%M.%S"))
+
 ### 24 hourly mean diurnal precipitation
 
 gsmap_hourly_mean_jf <- stackApply(gsmap_jf, indices, fun = mean)
@@ -593,7 +612,7 @@ gsmap_jf_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_jf <- length(indices)
+total_available_hours_jf <- length(unique_dates)
 gsmap_jf_frequency <- (precip_hours_jf / total_available_hours_jf) * 100
 
 gsmap_jf_freq_dt <- as.data.frame(gsmap_jf_frequency, xy = TRUE) %>%
@@ -614,6 +633,8 @@ gsmap_jf_freq_dt[!is.finite(prec_freq), prec_freq := NA]
 #get the date from the names of the layers and extract the month
 indices <- format(as.POSIXct(names(gsmap_mam), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
+
+unique_dates <- unique(as.Date(names(gsmap_mam), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation
 
@@ -651,7 +672,7 @@ gsmap_mam_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_mam <- length(indices)
+total_available_hours_mam <- length(unique_dates)
 gsmap_mam_frequency <- (precip_hours_mam / total_available_hours_mam) * 100
 
 gsmap_mam_freq_dt <- as.data.frame(gsmap_mam_frequency, xy = TRUE) %>%
@@ -672,6 +693,8 @@ gsmap_mam_freq_dt[!is.finite(prec_freq), prec_freq := NA]
 #get the date from the names of the layers and extract the month
 indices <- format(as.POSIXct(names(gsmap_jjas), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
+
+unique_dates <- unique(as.Date(names(gsmap_jjas), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation
 
@@ -708,7 +731,7 @@ gsmap_jjas_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_jjas <- length(indices)
+total_available_hours_jjas <- length(unique_dates)
 gsmap_jjas_frequency <- (precip_hours_jjas / total_available_hours_jjas) * 100
 
 gsmap_jjas_freq_dt <- as.data.frame(gsmap_jjas_frequency, xy = TRUE) %>%
@@ -729,6 +752,8 @@ gsmap_jjas_freq_dt[!is.finite(prec_freq), prec_freq := NA]
 #get the date from the names of the layers and extract the month
 indices <- format(as.POSIXct(names(gsmap_ond), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
+
+unique_dates <- unique(as.Date(names(gsmap_ond), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation
 
@@ -765,7 +790,7 @@ gsmap_ond_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_ond <- length(indices)
+total_available_hours_ond <- length(unique_dates)
 gsmap_ond_frequency <- (precip_hours_ond / total_available_hours_ond) * 100
 
 gsmap_ond_freq_dt <- as.data.frame(gsmap_ond_frequency, xy = TRUE) %>%
@@ -830,6 +855,8 @@ era5_ond <- era5[[ond]]
 indices <- format(as.POSIXct(time(era5_jf), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
 
+unique_dates <- unique(as.Date(time(era5_jf), format = "X%Y.%m.%d.%H.%M.%S"))
+
 ### 24 hourly mean diurnal precipitation
 
 era5_hourly_mean_jf <- tapp(era5_jf, indices, fun = mean)
@@ -864,7 +891,7 @@ era5_jf_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_jf <- length(indices)
+total_available_hours_jf <- length(unique_dates)
 era5_jf_frequency <- (precip_hours_jf / total_available_hours_jf) * 100
 
 era5_jf_freq_dt <- as.data.frame(era5_jf_frequency, xy = TRUE) %>%
@@ -883,6 +910,8 @@ era5_jf_freq_dt[!is.finite(prec_freq), prec_freq := NA]
 #get the date from the names of the layers and extract the month
 indices <- format(as.POSIXct(time(era5_mam), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
+
+unique_dates <- unique(as.Date(time(era5_mam), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation 
 era5_hourly_mean_mam <- tapp(era5_mam, indices, fun = mean)
@@ -916,7 +945,7 @@ era5_mam_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_mam <- length(indices)
+total_available_hours_mam <- length(unique_dates)
 era5_mam_frequency <- (precip_hours_mam / total_available_hours_mam) * 100
 
 era5_mam_freq_dt <- as.data.frame(era5_mam_frequency, xy = TRUE) %>%
@@ -934,6 +963,8 @@ era5_mam_freq_dt[!is.finite(prec_freq), prec_freq := NA]
 
 indices <- format(as.POSIXct(time(era5_jjas), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
+
+unique_dates <- unique(as.Date(time(era5_jjas), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation
 era5_hourly_mean_jjas <- tapp(era5_jjas, indices, fun = mean)
@@ -971,7 +1002,7 @@ era5_jjas_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_jjas <- length(indices)
+total_available_hours_jjas <- length(unique_dates)
 era5_jjas_frequency <- (precip_hours_jjas / total_available_hours_jjas) * 100
 
 era5_jjas_freq_dt <- as.data.frame(era5_jjas_frequency, xy = TRUE) %>%
@@ -991,6 +1022,7 @@ era5_jjas_freq_dt[!is.finite(prec_freq), prec_freq := NA]
 indices <- format(as.POSIXct(time(era5_ond), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
 
+unique_dates <- unique(as.Date(time(era5_ond), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation
 era5_hourly_mean_ond <- tapp(era5_ond, indices, fun = mean)
@@ -1028,7 +1060,7 @@ era5_ond_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_ond <- length(indices)
+total_available_hours_ond <- length(unique_dates)
 era5_ond_frequency <- (precip_hours_ond / total_available_hours_ond) * 100
 
 era5_ond_freq_dt <- as.data.frame(era5_ond_frequency, xy = TRUE) %>%
@@ -1103,6 +1135,8 @@ persiann_ond <- persiann[[ond]]
 indices <- format(as.POSIXct(time(persiann_jf), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
 
+unique_dates <- unique(as.Date(time(persiann_jf), format = "X%Y.%m.%d.%H.%M.%S"))
+
 ### 24 hourly mean diurnal precipitation
 persiann_hourly_mean_jf <- tapp(persiann_jf, indices, fun = mean, na.rm = TRUE)
 persiann_jf_mean_dt <- as.data.frame(persiann_hourly_mean_jf, xy = TRUE) %>%
@@ -1138,7 +1172,7 @@ persiann_jf_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_jf <- length(indices)
+total_available_hours_jf <- length(unique_dates)
 persiann_jf_frequency <- (precip_hours_jf / total_available_hours_jf) * 100
 
 persiann_jf_freq_dt <- as.data.frame(persiann_jf_frequency, xy = TRUE) %>%
@@ -1157,6 +1191,8 @@ persiann_jf_freq_dt[!is.finite(prec_freq), prec_freq := NA]
 #get the date from the names of the layers and extract the month
 indices <- format(as.POSIXct(time(persiann_mam), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
+
+unique_dates <- unique(as.Date(time(persiann_mam), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation
 persiann_hourly_mean_mam <- tapp(persiann_mam, indices, fun = mean, na.rm = TRUE)
@@ -1191,7 +1227,7 @@ persiann_mam_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_mam <- length(indices)
+total_available_hours_mam <- length(unique_dates)
 persiann_mam_frequency <- (precip_hours_mam / total_available_hours_mam) * 100
 
 persiann_mam_freq_dt <- as.data.frame(persiann_mam_frequency, xy = TRUE) %>%
@@ -1210,6 +1246,8 @@ persiann_mam_freq_dt[!is.finite(prec_freq), prec_freq := NA]
 #get the date from the names of the layers and extract the month
 indices <- format(as.POSIXct(time(persiann_jjas), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices)
+
+unique_dates <- unique(as.Date(time(persiann_jjas), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation
 persiann_hourly_mean_jjas <- tapp(persiann_jjas, indices, fun = mean, na.rm = TRUE)
@@ -1244,7 +1282,7 @@ persiann_jjas_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_jjas <- length(indices)
+total_available_hours_jjas <- length(unique_dates)
 persiann_jjas_frequency <- (precip_hours_jjas / total_available_hours_jjas) * 100
 
 persiann_jjas_freq_dt <- as.data.frame(persiann_jjas_frequency, xy = TRUE) %>%
@@ -1264,6 +1302,8 @@ persiann_jjas_freq_dt[!is.finite(prec_freq), prec_freq := NA]
 #get the date from the names of the layers and extract the month
 indices <- format(as.POSIXct(time(persiann_ond), format = "X%Y.%m.%d.%H.%M.%S"), format = "%H")
 indices <- as.numeric(indices) 
+
+unique_dates <- unique(as.Date(time(persiann_ond), format = "X%Y.%m.%d.%H.%M.%S"))
 
 ### 24 hourly mean diurnal precipitation
 persiann_hourly_mean_ond <- tapp(persiann_ond, indices, fun = mean, na.rm = TRUE)
@@ -1298,7 +1338,7 @@ persiann_ond_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_ond <- length(indices)
+total_available_hours_ond <- length(unique_dates)
 persiann_ond_frequency <- (precip_hours_ond / total_available_hours_ond) * 100
 
 persiann_ond_freq_dt <- as.data.frame(persiann_ond_frequency, xy = TRUE) %>%
@@ -1378,7 +1418,7 @@ estimate_diurnal <- function(datasetname, output_dir) {
   
   dataset_jf_int_dt[!is.finite(prec_int), prec_int := NA]
   
-  total_available_hours_jf <- length(indices)
+  total_available_hours_jf <- length(unique_dates)
   dataset_jf_frequency <- (precip_hours_jf / total_available_hours_jf) * 100
   
   dataset_jf_freq_dt <- as.data.frame(dataset_jf_frequency, xy = TRUE) %>%
@@ -1408,7 +1448,7 @@ estimate_diurnal <- function(datasetname, output_dir) {
   
   dataset_mam_int_dt[!is.finite(prec_int), prec_int := NA]
   
-  total_available_hours_mam <- length(indices)
+  total_available_hours_mam <- length(unique_dates)
   dataset_mam_frequency <- (precip_hours_mam / total_available_hours_mam) * 100
   
   dataset_mam_freq_dt <- as.data.frame(dataset_mam_frequency, xy = TRUE) %>%
@@ -1437,7 +1477,7 @@ estimate_diurnal <- function(datasetname, output_dir) {
   
   dataset_jjas_int_dt[!is.finite(prec_int), prec_int := NA]
   
-  total_available_hours_jjas <- length(indices)
+  total_available_hours_jjas <- length(unique_dates)
   dataset_jjas_frequency <- (precip_hours_jjas / total_available_hours_jjas) * 100
   
   dataset_jjas_freq_dt <- as.data.frame(dataset_jjas_frequency, xy = TRUE) %>%
@@ -1465,7 +1505,7 @@ estimate_diurnal <- function(datasetname, output_dir) {
   
   dataset_ond_int_dt[!is.finite(prec_int), prec_int := NA]
   
-  total_available_hours_ond <- length(indices)
+  total_available_hours_ond <- length(unique_dates)
   dataset_ond_frequency <- (precip_hours_ond / total_available_hours_ond) * 100
   
   dataset_ond_freq_dt <- as.data.frame(dataset_ond_frequency, xy = TRUE) %>%
@@ -1529,7 +1569,7 @@ estimate_diurnal_parallel <- function(datasetname, output_dir) {
   
   dataset_jf_int_dt[!is.finite(prec_int), prec_int := NA]
   
-  total_available_hours_jf <- length(indices)
+  total_available_hours_jf <- length(unique_dates)
   dataset_jf_frequency <- (precip_hours_jf / total_available_hours_jf) * 100
   
   dataset_jf_freq_dt <- as.data.frame(dataset_jf_frequency, xy = TRUE) %>%
@@ -1569,7 +1609,7 @@ estimate_diurnal_parallel <- function(datasetname, output_dir) {
     
     dataset_int_dt[!is.finite(prec_int), prec_int := NA]
     
-    total_available_hours <- length(indices)
+    total_available_hours <- length(unique_dates)
     dataset_frequency <- (precip_hours / total_available_hours) * 100
     
     dataset_freq_dt <- as.data.frame(dataset_frequency, xy = TRUE) %>%
@@ -1664,7 +1704,7 @@ cmorph_jf_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_jf <- length(indices)
+total_available_hours_jf <- length(unique_dates)
 cmorph_jf_frequency <- (precip_hours_jf / total_available_hours_jf) * 100
 
 cmorph_jf_freq_dt <- as.data.frame(cmorph_jf_frequency, xy = TRUE) %>%
@@ -1741,7 +1781,7 @@ persiann_jf_int_dt[!is.finite(prec_int), prec_int := NA]
 
 ### Frequency
 # Calculate the total available hours
-total_available_hours_jf <- length(indices)
+total_available_hours_jf <- length(unique_dates)
 persiann_jf_frequency <- (precip_hours_jf / total_available_hours_jf) * 100
 
 persiann_jf_freq_dt <- as.data.frame(persiann_jf_frequency, xy = TRUE) %>%

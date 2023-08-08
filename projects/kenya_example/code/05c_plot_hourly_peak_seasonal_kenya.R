@@ -68,9 +68,9 @@ levels(mean_int_freq$variable) <- c("Mean", "Intensity", "Frequency")
 mean_int_freq_24h <- mean_int_freq[, .(mean_value = mean(value, na.rm = TRUE)), by = .(hour(time_lst), name, variable, season)]
 
 ggplot(mean_int_freq_24h, aes(hour, mean_value, col = name, group = name)) + 
-  geom_point() + 
+  geom_point(size = 0.8) + 
   geom_line() + 
-  labs(x ="Time", y = "Mean precipitation (mm/hr)", fill = "") + 
+  labs(x ="Time", y = "", fill = "") + 
   facet_grid(variable~season, scales = "free") + 
   theme_generic + 
   theme(legend.title = element_blank(), strip.background = element_rect(fill = "white"),
