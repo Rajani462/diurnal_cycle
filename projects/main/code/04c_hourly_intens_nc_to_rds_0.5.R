@@ -129,4 +129,4 @@ dat_lst_list <- lapply(merged_list, function(dt) {
   return(dt)
 })
 
-saveRDS(dat_lst_list, "./projects/main/data/hourly_int_thres_0.5_all_datasets_LST_glob_2001_20.rds")
+saveRDS(dat_lst_list, "./projects/main/data/hourly_int_thres_0.5_all_datasets_LST_glob_2001_20_seasonal.rds")
