@@ -18,10 +18,10 @@ file_paths <- character(0)
 
 for (dataset in datasets) {
   for (season in seasons) {
-    file_name <- paste0("hourly_int_", dataset, "_tp_mm_60ns_", ifelse(dataset == "gsmap", "2015_20", "2001_20"), "_025_hourly_", season)
-    if (dataset %in% c("imerg", "gsmap")) {
-      file_name <- paste0(file_name, "_fliptrans")
-    }
+    file_name <- paste0("hourly_freq_", dataset, "_tp_mm_60ns_", ifelse(dataset == "gsmap", "2015_20", "2001_20"), "_025_hourly_", season, "_0.5")
+    # if (dataset %in% c("imerg", "gsmap")) {
+    #   file_name <- paste0(file_name, "_fliptrans")
+    # }
     file_path <- paste0("~/shared/data_downloads/input_data/seasonal/hourly_character/", file_name, ".nc")
     file_paths <- c(file_paths, file_path)
   }
@@ -39,7 +39,7 @@ registerDoParallel(cl)
 
 # Function to extract the dataset name from the file path
 extract_dataset_name <- function(file_path) {
-  start_index <- regexpr("hourly_int_", file_path) + nchar("hourly_int_")
+  start_index <- regexpr("hourly_freq_", file_path) + nchar("hourly_freq_")
   end_index <- regexpr("_tp", file_path, fixed = TRUE)
   dataset_name <- substr(file_path, start_index, end_index - 1)
   return(dataset_name)
@@ -73,7 +73,7 @@ process_dataset <- function(file_path) {
     # Continue with the main processing steps
     dataset_dt <- as.data.frame(persiann, xy = TRUE, na.rm = TRUE) %>%
       as.data.table() %>%
-      data.table::melt(., id.vars = c("x", "y"), variable.name = "date", value.name = "prec_int") %>%
+      data.table::melt(., id.vars = c("x", "y"), variable.name = "date", value.name = "prec_freq_0.5") %>%
       `[`(, name := factor(dataset_name)) %>%
       `[`(, season := factor(season))
   } else {
@@ -81,7 +81,7 @@ process_dataset <- function(file_path) {
     dataset <- brick(file_path)
     dataset_dt <- as.data.frame(dataset, xy = TRUE, na.rm = TRUE) %>%
       as.data.table() %>%
-      data.table::melt(., id.vars = c("x", "y"), variable.name = "date", value.name = "prec_int") %>%
+      data.table::melt(., id.vars = c("x", "y"), variable.name = "date", value.name = "prec_freq_0.5") %>%
       `[`(, name := factor(dataset_name)) %>%
       `[`(, season := factor(season))
   }
@@ -121,11 +121,11 @@ library(hms)
 
 dat_lst_list <- lapply(merged_list, function(dt) {
   dt$date <- substr(dt$date, 13, 14) %>% paste0(":00:00")
-  dt <- dt[, .(lat = y, lon = x, time_utc = as_hms(date), prec_int, name, season, location)]
+  dt <- dt[, .(lat = y, lon = x, time_utc = as_hms(date), prec_freq_0.5, name, season, location)]
   dt[, `:=`(tmz_offset = round((lon / 15)))]
   dt$time_utc <- as.POSIXct(dt$time_utc)
   dt[, `:=`(time_lst = time_utc + lubridate::hours(tmz_offset))]
   return(dt)
 })
 
-saveRDS(dat_lst_list, "./projects/main/data/hourly_int_all_datasets_LST_glob_2001_20.rds")
+saveRDS(dat_lst_list, "./projects/main/data/hourly_freq_thres_0.5_all_datasets_LST_glob_2001_20.rds")

@@ -18,14 +18,17 @@ file_paths <- character(0)
 
 for (dataset in datasets) {
   for (season in seasons) {
-    file_name <- paste0("hourly_mean_", dataset, "_glob_", ifelse(dataset == "gsmap", "2015_20", "2001_20"), "_", season)
-    if (dataset %in% c("imerg", "gsmap")) {
-      file_name <- paste0(file_name, "_fliptrans")
-    }
+    file_name <- paste0("hourly_mean_", dataset, "_tp_mm_60ns_", ifelse(dataset == "gsmap", "2015_20", "2001_20"), "_025_hourly_", season)
+    # if (dataset %in% c("imerg", "gsmap")) {
+    #   file_name <- paste0(file_name, "_fliptrans")
+    # }
     file_path <- paste0("~/shared/data_downloads/input_data/seasonal/hourly_character/", file_name, ".nc")
     file_paths <- c(file_paths, file_path)
   }
 }
+
+
+hourly_freq_persiann_tp_mm_60ns_2001_20_025_hourly_jja.nc
 
 # Print the generated file paths
 print(file_paths)
