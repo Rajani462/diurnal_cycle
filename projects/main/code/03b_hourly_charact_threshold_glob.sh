@@ -118,3 +118,8 @@ cp ~/shared/data_downloads/ERA5/era5_tp_mm_hourly_60ns_2001_2020_regrid.nc ~/sha
 cp ~/shared/data_downloads/cmorph_merged_hour/cmorph_hour_2001_20_rotated.nc ~/shared/data_downloads/input_data/
 cp ~/shared/data_downloads/IMERG_F_hourly/imerg_f_hour_60ns_2001_20_grid025.nc ~/shared/data_downloads/input_data/
 cp ~/shared/data_downloads/GSMAP/ftp_downloads/netcdf/gsmap_hour_60ns_2015_20_grid_025.nc ~/shared/data_downloads/input_data/
+
+# change the variable names to a common : "precip" among the datasets
+cdo chname,SST,new_sst yi_sst.nc yi_sst_2.nc
+cdo -b 32 -P 50 chname,cmorph,precip cmorph_tp_mm_60ns_2001_20_025_hourly_rotated.nc cmorph_tp_mm_60ns_2001_20_025_hourly_rotated.nc
+
