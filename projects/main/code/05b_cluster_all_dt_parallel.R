@@ -715,3 +715,117 @@ ggplot(to_plot, aes(hour, mean_value, col = clusters, group = clusters)) +
   theme_generic + 
   theme( legend.direction = "vertical", legend.position = "right")
 
+################################################################################
+
+
+to_plot_list <- lapply(names(processed_data_list), function(name) {
+  data_dt <- processed_data_list[[name]]
+  to_plot <- data_dt[, .(mean_value = mean(value, na.rm = TRUE), 
+                         q25 = quantile(value, 0.25, na.rm = TRUE), 
+                         q75 = quantile(value, 0.75, na.rm = TRUE)), by = .(hour, clusters = as.factor(clusters))]
+  to_plot$dataset_name <- factor(name)
+  return(to_plot)
+})
+
+
+
+dat <- rbindlist(to_plot_list)
+
+setnames(dat, "dataset_name", "name")
+dat[, `:=`(custer_name = factor(clusters))]
+dat[name  == "imergf" | name  == "cmorph" | name  == "era5" & clusters == "3", `:=`(cluster_name = factor("Afternoon peak"))]
+dat[name  == "gsmap" & clusters == "1", `:=`(cluster_name = factor("Afternoon peak"))]
+dat[name  == "persiann" & clusters == "4", `:=`(cluster_name = factor("Afternoon peak"))]
+dat[name  == "imergf" & clusters == "4", `:=`(cluster_name = factor("Early-morning peak"))]
+dat[name  == "cmorph" | name  == "persiann" | name  == "era5" & clusters == "1", `:=`(cluster_name = factor("Early-morning peak"))]
+dat[name  == "gsmap" & clusters == "2", `:=`(cluster_name = factor("Early-morning peak"))]
+dat[name  == "imergf" | name  == "cmorph" & clusters == "2", `:=`(cluster_name = factor("Late-morning peak"))]
+dat[name  == "gsmap" & clusters == "3", `:=`(cluster_name = factor("Late-morning peak"))]
+dat[name  == "imergf" & clusters == "1", `:=`(cluster_name = factor("Mid-night peak"))]
+dat[name  == "cmorph" & clusters == "4", `:=`(cluster_name = factor("Mid-night peak"))]
+dat[name  == "persiann" & clusters == "3", `:=`(cluster_name = factor("Mid-night peak"))]
+dat[name  == "persiann" & clusters == "2", `:=`(cluster_name = factor("Late-morning peak"))]
+dat[name  == "era5" & clusters == "4", `:=`(cluster_name = factor("Afternoon high peak"))]
+dat[name  == "era5" & clusters == "2", `:=`(cluster_name = factor("Late-morning peak"))]
+dat[name  == "gsmap" & clusters == "4", `:=`(cluster_name = factor("Bimodal peak"))]
+dat[name  == "imergf" & clusters == "3", `:=`(cluster_name = factor("Afternoon peak"))]
+dat[name  == "imergf" & clusters == "4", `:=`(cluster_name = factor("Early-morning peak"))]
+dat[name  == "persiann" & clusters == "4", `:=`(cluster_name = factor("Afternoon peak"))]
+dat[name  == "cmorph" & clusters == "3", `:=`(cluster_name = factor("Afternoon peak"))]
+
+levels(dat$cluster_name)
+
+to_plot_all <- dat
+levels(to_plot_all$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
+
+ggplot(to_plot_all, aes(hour, mean_value, col = cluster_name, group = cluster_name)) + 
+  geom_point() + 
+  geom_line(linewidth = 1.2) + 
+  facet_wrap(~name, ncol = 3) + 
+  labs(x ="Hour (LST)", y = "Precipitation (mm/hr)", fill = "Clusters") + 
+  theme_generic + 
+  theme(legend.direction = "vertical", legend.position = "right") + 
+  theme(legend.position = c(0.8, 0.2)) + 
+  scale_x_discrete(labels = function(x) ifelse(as.numeric(x) %% 4 == 0, x, ""))
+
+ggsave("./projects/main/results/cluster/05b_all_data_cluster_4_line_plot_named.png", width = 9.5, height = 5.3, 
+       units = "in", dpi = 600)
+
+
+
+#spatial named---------------
+
+to_plot_list <- lapply(names(processed_data_list), function(name) {
+  data_dt <- processed_data_list[[name]]
+  to_plot <- data_dt[, .(mean_value = mean(value, na.rm = TRUE)), by = .(lat, lon, clusters = as.factor(clusters))]
+  to_plot$dataset_name <- factor(name)
+  return(to_plot)
+})
+
+
+
+dat <- rbindlist(to_plot_list)
+
+setnames(dat, "dataset_name", "name")
+dat[, `:=`(custer_name = factor(clusters))]
+dat[name  == "imergf" | name  == "cmorph" | name  == "era5" & clusters == "3", `:=`(cluster_name = factor("Afternoon peak"))]
+dat[name  == "gsmap" & clusters == "1", `:=`(cluster_name = factor("Afternoon peak"))]
+dat[name  == "persiann" & clusters == "4", `:=`(cluster_name = factor("Afternoon peak"))]
+dat[name  == "imergf" & clusters == "4", `:=`(cluster_name = factor("Early-morning peak"))]
+dat[name  == "cmorph" | name  == "persiann" | name  == "era5" & clusters == "1", `:=`(cluster_name = factor("Early-morning peak"))]
+dat[name  == "gsmap" & clusters == "2", `:=`(cluster_name = factor("Early-morning peak"))]
+dat[name  == "imergf" | name  == "cmorph" & clusters == "2", `:=`(cluster_name = factor("Late-morning peak"))]
+dat[name  == "gsmap" & clusters == "3", `:=`(cluster_name = factor("Late-morning peak"))]
+dat[name  == "imergf" & clusters == "1", `:=`(cluster_name = factor("Mid-night peak"))]
+dat[name  == "cmorph" & clusters == "4", `:=`(cluster_name = factor("Mid-night peak"))]
+dat[name  == "persiann" & clusters == "3", `:=`(cluster_name = factor("Mid-night peak"))]
+dat[name  == "persiann" & clusters == "2", `:=`(cluster_name = factor("Late-morning peak"))]
+dat[name  == "era5" & clusters == "4", `:=`(cluster_name = factor("Afternoon high peak"))]
+dat[name  == "era5" & clusters == "2", `:=`(cluster_name = factor("Late-morning peak"))]
+dat[name  == "gsmap" & clusters == "4", `:=`(cluster_name = factor("Bimodal peak"))]
+dat[name  == "imergf" & clusters == "3", `:=`(cluster_name = factor("Afternoon peak"))]
+dat[name  == "imergf" & clusters == "4", `:=`(cluster_name = factor("Early-morning peak"))]
+dat[name  == "persiann" & clusters == "4", `:=`(cluster_name = factor("Afternoon peak"))]
+dat[name  == "cmorph" & clusters == "3", `:=`(cluster_name = factor("Afternoon peak"))]
+
+levels(dat$cluster_name)
+
+to_plot_all <- dat
+levels(to_plot_all$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
+
+ggplot(to_plot_all) + 
+  geom_raster(aes(lon, lat, fill = cluster_name)) + 
+  #scale_fill_manual(values = rainbow(24)) + 
+  borders(colour = "black") + 
+  labs(x ="", y = "") + 
+  facet_wrap(~name, ncol = 3) + 
+  coord_cartesian(xlim = c(min(to_plot_all$lon), max(to_plot_all$lon)), 
+                  ylim = c(min(to_plot_all$lat), max(to_plot_all$lat))) + 
+  scale_x_continuous(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0)) + 
+  theme_generic + 
+  theme( legend.direction = "vertical", legend.position = "right") + 
+  theme(legend.position = c(0.8, 0.15))
+
+ggsave("./projects/main/results/cluster/all_data_cluster_4_spat_plot_named.png", width = 9.9, height = 4.6, 
+       units = "in", dpi = 600)
