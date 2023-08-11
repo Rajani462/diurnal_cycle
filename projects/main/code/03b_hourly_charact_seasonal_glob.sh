@@ -227,18 +227,20 @@ cdo -f nc -mul -expr,'topo=((topo<0.0))?1.0:topo/0.0' -remapbil,hourly_int_era5_
 
 #################################################################################################################
 
-
+### diurnal mean--------------------------------------------------
 #!/bin/bash
+
+cd ~/shared/data_downloads/input_data/seasonal/hourly_character
 
 for input_file in ~/shared/data_downloads/input_data/seasonal/*.nc; do
     # Extract the file name without extension
     file_name=$(basename "$input_file" .nc)
     
     # Define the output file path
-    output_file="${file_name}_freq_0.1_2001_20.nc"
+    output_file="hourly_mean_${file_name}.nc"
     
     # Run the cdo command
-    cdo -P 50 -mulc,100 -div -dhoursum -expr,'count_value_above_0_1 = (precip >= 0.1 ? 1 : 0)' "$input_file" -dhoursum -expr,'valid_mask = precip >= 0' "$input_file" "$output_file"
+    cdo -b 32 -P 50 dhourmean "$input_file" "$output_file"
 done
 
 
@@ -246,12 +248,14 @@ done
 
 #!/bin/bash
 
+cd ~/shared/data_downloads/input_data/seasonal/hourly_character
+
 for input_file in ~/shared/data_downloads/input_data/seasonal/*.nc; do
     # Extract the file name without extension
     file_name=$(basename "$input_file" .nc)
     
     # Define the output file path
-    output_file="hour_freq_${file_name}_.nc"
+    output_file="hourly_freq_${file_name}.nc"
     
     # Run the cdo command
     cdo -P 50 -mulc,100 -div -dhoursum -expr,'count_value_above_0_1 = (precip >= 0.1 ? 1 : 0)' "$input_file" -dhoursum -expr,'valid_mask = precip >= 0' "$input_file" "$output_file"
@@ -261,15 +265,71 @@ done
 ### diurnal intensity----------------------------------------------------
 
 #!/bin/bash
+cd ~/shared/data_downloads/input_data/seasonal/hourly_character
 
 for input_file in ~/shared/data_downloads/input_data/seasonal/*.nc; do
     # Extract the file name without extension
     file_name=$(basename "$input_file" .nc)
     
     # Define the output file path
-    output_file="hour_int_${file_name}.nc"
+    output_file="hourly_int_${file_name}.nc"
     
     # Run the cdo command
-    cdo -P 40 -div -dhoursum -mul "$input_file" -expr,'count_value_above_0_1 = (precip >= 0.1 ? 1 : 0)' "$input_file" -dhoursum -expr,'count_value_above_0_1 = (precip >= 0.1 ? 1 : 0)' "$input_file" "$output_file"
+    cdo -P 43 -div -dhoursum -mul "$input_file" -expr,'count_value_above_0_1 = (precip >= 0.1 ? 1 : 0)' "$input_file" -dhoursum -expr,'count_value_above_0_1 = (precip >= 0.1 ? 1 : 0)' "$input_file" "$output_file"
 done
 
+
+
+#############for different threshold----------------------------------
+
+# for 0.5 mm/hr
+### diurnal mean--------------------------------------------------
+#!/bin/bash
+
+cd ~/shared/data_downloads/input_data/seasonal/hourly_character
+
+for input_file in ~/shared/data_downloads/input_data/seasonal/*.nc; do
+    # Extract the file name without extension
+    file_name=$(basename "$input_file" .nc)
+    
+    # Define the output file path
+    output_file="hourly_mean_${file_name}.nc"
+    
+    # Run the cdo command
+    cdo -b 32 -P 50 dhourmean "$input_file" "$output_file"
+done
+
+
+### diurnal frequency--------------------------------------------------
+
+#!/bin/bash
+
+cd ~/shared/data_downloads/input_data/seasonal/hourly_character
+
+for input_file in ~/shared/data_downloads/input_data/seasonal/*.nc; do
+    # Extract the file name without extension
+    file_name=$(basename "$input_file" .nc)
+    
+    # Define the output file path
+    output_file="hourly_freq_${file_name}_0.5.nc"
+    
+    # Run the cdo command
+    cdo -P 50 -mulc,100 -div -dhoursum -expr,'count_value_above_0_1 = (precip >= 0.5 ? 1 : 0)' "$input_file" -dhoursum -expr,'valid_mask = precip >= 0' "$input_file" "$output_file"
+done
+
+
+### diurnal intensity----------------------------------------------------
+
+#!/bin/bash
+cd ~/shared/data_downloads/input_data/seasonal/hourly_character
+
+for input_file in ~/shared/data_downloads/input_data/seasonal/*.nc; do
+    # Extract the file name without extension
+    file_name=$(basename "$input_file" .nc)
+    
+    # Define the output file path
+    output_file="hourly_int_${file_name}_0.5.nc"
+    
+    # Run the cdo command
+    cdo -P 43 -div -dhoursum -mul "$input_file" -expr,'count_value_above_0_1 = (precip >= 0.5 ? 1 : 0)' "$input_file" -dhoursum -expr,'count_value_above_0_1 = (precip >= 0.5 ? 1 : 0)' "$input_file" "$output_file"
+done
