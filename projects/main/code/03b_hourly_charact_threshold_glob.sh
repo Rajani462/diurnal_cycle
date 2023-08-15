@@ -123,3 +123,69 @@ cp ~/shared/data_downloads/GSMAP/ftp_downloads/netcdf/gsmap_hour_60ns_2015_20_gr
 cdo chname,SST,new_sst yi_sst.nc yi_sst_2.nc
 cdo -b 32 -P 50 chname,cmorph,precip cmorph_tp_mm_60ns_2001_20_025_hourly_rotated.nc cmorph_tp_mm_60ns_2001_20_025_hourly_rotated.nc
 
+############################
+
+#############for different threshold----------------------------------
+
+# for 0.5 mm/hr
+### diurnal mean--------------------------------------------------
+#!/bin/bash
+
+cd ~/shared/data_downloads/input_data/seasonal/hourly_character (#it will be the output directory)
+
+for input_file in ~/shared/data_downloads/input_data/*.nc; do
+    # Extract the file name without extension
+    file_name=$(basename "$input_file" .nc)
+    
+    # Define the output file path
+    output_file="hourly_mean_${file_name}.nc"
+    
+    # Run the cdo command
+    cdo -b 32 -P 50 dhourmean "$input_file" "$output_file"
+done
+
+
+### diurnal frequency--------------------------------------------------
+
+#!/bin/bash
+
+cd ~/shared/data_downloads/input_data/seasonal/hourly_character
+
+for input_file in ~/shared/data_downloads/input_data/*.nc; do
+    # Extract the file name without extension
+    file_name=$(basename "$input_file" .nc)
+    
+    # Extract the relevant parts of the file name
+    # Assuming the format is: cmorph_tp_mm_60ns_2001_20_025_hourly_rotated.nc
+    IFS="_" read -ra name_parts <<< "$file_name"
+    output_file="hourly_freq_${name_parts[0]}_${name_parts[-3]}_${name_parts[-2]}_${name_parts[-1]}_0.5.nc"
+    
+    
+    # Run the cdo command
+    cdo -P 50 -mulc,100 -div -dhoursum -expr,'count_value_above_0_1 = (precip >= 0.5 ? 1 : 0)' "$input_file" -dhoursum -expr,'valid_mask = precip >= 0' "$input_file" "$output_file"
+done
+
+
+### diurnal intensity----------------------------------------------------
+
+#!/bin/bash
+cd ~/shared/data_downloads/input_data/seasonal/hourly_character
+
+for input_file in ~/shared/data_downloads/input_data/*.nc; do
+    # Extract the file name without extension
+    file_name=$(basename "$input_file" .nc)
+    
+    # Define the output file path
+    # Extract the relevant parts of the file name
+    # Assuming the format is: cmorph_tp_mm_60ns_2001_20_025_hourly_rotated.nc
+
+    IFS="_" read -ra name_parts <<< "$file_name"
+    output_file="hourly_freq_${name_parts[0]}_${name_parts[-3]}_${name_parts[-2]}_${name_parts[-1]}_0.5.nc"
+    
+    
+    # Run the cdo command
+    cdo -P 43 -div -dhoursum -mul "$input_file" -expr,'count_value_above_0_1 = (precip >= 0.5 ? 1 : 0)' "$input_file" -dhoursum -expr,'count_value_above_0_1 = (precip >= 0.5 ? 1 : 0)' "$input_file" "$output_file"
+done
+
+
+

@@ -18,6 +18,8 @@ cdo ensstd mean_imerg_kenya_2001_20.nc mean_era5_kenya_2001_20.nc mean_cmorph_ke
 
 # code taken from: https://code.mpimet.mpg.de/boards/2/topics/6653
 
+cd ~/rajani/diurnal_cycle/projects/main/data/
+
 cdo -b 32 -P 50 dhourmean ~/shared/data_downloads/ERA5/era5_tp_mm_hourly_60ns_2001_2020_regrid.nc hourly_mean_era5_glob_2001_20.nc #[2512.92s 244MB]
 cdo -b 32 -P 50 dhourmean ~/shared/data_downloads/IMERG_F_hourly/imerg_f_hour_60ns_2001_20_grid025.nc hourly_mean_imerg_glob_2001_20.nc
 cdo -b 32 -P 50 dhourmean ~/shared/data_downloads/cmorph_merged_hour/cmorph_hour_2001_20_rotated.nc hourly_mean_cmorph_glob_2001_20.nc
