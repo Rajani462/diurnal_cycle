@@ -80,7 +80,7 @@ process_dataset <- function(file_path) {
     names(dataset) <- posixct_time
   }
   
-  dataset_dt <- as.data.frame(dataset, xy = TRUE, na.rm = TRUE) %>%
+  dataset_dt <- as.data.frame(dataset, xy = TRUE, na.rm = FALSE) %>%
     as.data.table() %>%
     data.table::melt(., id.vars = c("x", "y"), variable.name = "date", value.name = "prec_int_0.5") %>%
     `[`(, name := factor(dataset_name)) %>%
