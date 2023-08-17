@@ -61,13 +61,14 @@ ggplot(spat_mean_dt) +
                   ylim = c(min(spat_mean_dt$lat), max(spat_mean_dt$lat))) + 
   facet_grid(season~threshold~name) + 
   scale_x_continuous(expand = c(0, 0)) + 
-  labs(x = "", y = "", fill = "Intensity\n  \n (mm/hr)") + 
+  labs(x = "", y = "", fill = "Intensity (mm/hr)") + 
   #facet_grid(threshold~fct_relevel(name,  "IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")) + 
-  theme_generic + 
+  theme_small + 
   theme(strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'), 
-        legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.4, "cm"),
-        legend.key.height = unit(1.0, 'cm'))
+        legend.direction = "horizontal", legend.position = "bottom", legend.key.width = unit(2.6, "cm"),
+        legend.key.height = unit(0.35, 'cm'), legend.text = element_text(size = 10, hjust = 0.5)) + 
+  guides(fill = guide_colorsteps(title.position = "top", title.hjust =0.5))
 
 ggsave("./projects/main/results/06C_spat_int_thres_0.1_0.5_seasonal.png", width = 11.5, height = 5.3, 
        units = "in", dpi = 600)
