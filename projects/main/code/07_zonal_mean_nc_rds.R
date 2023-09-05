@@ -6,6 +6,8 @@ library(dplyr)
 library(sf)
 library(hms)
 library(forcats)
+library(ncdf4)
+library(data.table)
 #library(ggh4x)
 
 
@@ -14,114 +16,60 @@ source('./source/themes.R')
 source('./source/palettes.R')
 
 #########################################
-# Load the ncdf4 package
-# Load the required package
-
-library(ncdf4)
-library(data.table)
-library(terra)
-
-# Specify the path to your NetCDF file
-nc_file <- "~/shared/data_projects/diurnal_precip/processed/lat_mean_imerg.nc"
-a <- rast("~/shared/data_projects/diurnal_precip/processed/lat_mean_imerg.nc")
-
-as.data.frame(a, xy = TRUE)
-# Open the NetCDF file
-nc_data <- nc_open(nc_file)
-
-# Read the variable data
-variable_array <- ncvar_get(nc_data, "precip")  # Replace "precip" with the actual variable name
-
-# Extract time values from the NetCDF file
-time_values <- ncvar_get(nc_data, "time")
-
-obsdatadates = (nc_data$dim$time$vals)
-posixct_time <- as.POSIXct(time_values * 3600, origin = "2001-01-01 00:00:00")
-
-
-# Convert time values to POSIXct format
-base_time <- as.POSIXct("2015-01-01 00:00:00")
-time_dates <- base_time + as.difftime(time_values, units = "hours")
-time_dates <- base_time + as.difftime(time_values, units = "secs")  # Use "secs" as units
-
-# Extract latitude values from the NetCDF file
-latitude_values <- ncvar_get(nc_data, "lat")
-
-# Create a data.table with columns: date, precip, and lat
-data_dt <- data.table(
-  date = rep(time_dates, each = length(latitude_values)),
-  precip = as.vector(variable_array),
-  lat = rep(latitude_values, times = length(time_dates))
-)
-
-# Close the NetCDF file
-nc_close(nc_data)
-
-# Print the first few rows of the data.table
-print(data_dt)
-
-ggplot(data_dt, aes(lat, precip)) + 
-  #geom_point(size = 0.85) + 
-  geom_line() + 
-  #facet_wrap(~location) + 
-  labs(x ="Latitude", y = "Mean (mm/hr)") + 
-  #theme_generic + 
-  theme(legend.title = element_blank(), strip.background = element_rect(fill = "white"),
-        strip.text = element_text(colour = 'Black'))
-
-
-########################################################################
-
-library(ncdf4)
-library(data.table)
-
 # Define the directory containing the NetCDF files
+# Set the data directory
 data_dir <- "~/shared/data_projects/diurnal_precip/processed"
 
 # List of NetCDF files in the directory that match the pattern
-nc_files <- list.files(path = data_dir, pattern = "^lat_mean_(imerg|gsmap|cmorph|gsmap|era5|persiann)\\.nc$", full.names = TRUE)
-
+nc_files <- list.files(path = data_dir, pattern = "^lat_mean_(imerg|gsmap|cmorph|persiann|era5|)\\.nc$", full.names = TRUE)
 
 # Initialize an empty list to store the data tables
 data_dt_list <- list()
 
+# Define the desired order of datasets
+desired_order <- c("imerg", "gsmap", "cmorph", "persiann", "era5")
+
 # Iterate through each NetCDF file
 for (nc_file in nc_files) {
-  # Open the NetCDF file
-  nc_data <- nc_open(nc_file)
+  # Extract the dataset name from the file name
+  dataset_name <- sub(".*/lat_mean_([^\\.]+)\\.nc", "\\1", nc_file)
   
-  # Read the variable data
-  variable_array <- ncvar_get(nc_data, "precip")  # Replace "precip" with the actual variable name
-  
-  # Extract time values from the NetCDF file
-  dataset_name <- tools::file_path_sans_ext(basename(nc_file))  # Extract dataset name
-  
-  # Check if the dataset is "persiann" and use "datetime" variable if so
-  if (dataset_name == "lat_mean_persiann") {
-    time_values <- ncvar_get(nc_data, "datetime")
-  } else {
-    time_values <- ncvar_get(nc_data, "time")
+  # Check if the dataset is in the desired order
+  if (dataset_name %in% desired_order) {
+    # Open the NetCDF file
+    nc_data <- nc_open(nc_file)
+    
+    # Read the variable data (Replace "precip" with the actual variable name)
+    variable_array <- ncvar_get(nc_data, "precip")
+    
+    # Extract latitude values from the NetCDF file
+    latitude_values <- ncvar_get(nc_data, "lat")
+    
+    # Create a data.table with columns: date, precip, lat, and name
+    data_dt <- data.table(
+      precip = as.vector(variable_array),
+      lat = latitude_values,
+      name = as.factor(dataset_name)  # Add the dataset name as a factor
+    )
+    
+    # Append the data table to the list
+    data_dt_list[[dataset_name]] <- data_dt
+    
+    # Sort the data tables in the list by latitude values
+    data_dt_list <- lapply(data_dt_list, function(dt) dt[order(lat)])
+    
+    # Close the NetCDF file
+    nc_close(nc_data)
   }
-  
-  # Convert time values to POSIXct format
-  base_time <- as.POSIXct("2015-01-01 00:00:00")
-  time_dates <- base_time + as.difftime(time_values, units = "hours")
-  
-  # Extract latitude values from the NetCDF file
-  latitude_values <- ncvar_get(nc_data, "lat")
-  
-  # Create a data.table with columns: date, precip, lat, and name
-  data_dt <- data.table(
-    date = rep(time_dates, each = length(latitude_values)),
-    precip = as.vector(variable_array),
-    lat = rep(latitude_values, times = length(time_dates)),
-    name = as.factor(dataset_name)  # Add the dataset name as a factor
-  )
-  
-  # Append the data table to the list
-  data_dt_list[[dataset_name]] <- data_dt
-  
-  # Close the NetCDF file
-  nc_close(nc_data)
 }
 
+# Reorder the data tables based on the desired order
+reordered_dt_list <- lapply(desired_order, function(name) data_dt_list[[name]])
+
+# Combine the data tables into a single data table
+combined_dt <- rbindlist(reordered_dt_list)
+
+# Print the resulting combined data table
+print(combined_dt)
+
+saveRDS(combined_dt, "./projects/main/data/zonal_lat_mean_2001_20.rds")
