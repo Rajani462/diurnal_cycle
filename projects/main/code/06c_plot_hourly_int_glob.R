@@ -56,6 +56,7 @@ to_plot <- to_plot[, .(x, y, value = round(value, 2), name)]
 levels(to_plot$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
 summary(to_plot)
 to_plot[name == "PERSIANN" & value > 100]
+to_plot[value > 20]
 
 ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
@@ -68,16 +69,16 @@ ggplot() +
   geom_tile(data = to_plot, aes(x = x, y = y, fill = value), alpha = 1) + 
   facet_wrap(~name, ncol = 3) + 
   scale_fill_binned(type = "viridis", option = "B", direction = -1,
-                    breaks = c(0.3, 0.6, 0.9, 1.2, 1.5, 2, 2.5, 3, 4, 5, 7), show.limits = TRUE) + 
-  labs(x = NULL, y = NULL, fill = "Mean (mm/hr)") + 
+                    breaks = c(0.3, 0.6, 0.9, 1.2, 1.5, 2, 2.5, 3, 4, 5, 7, 10), show.limits = TRUE) + 
+  labs(x = NULL, y = NULL, fill = "Intensity (mm/hr)") + 
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "transparent", size = 0.25) +
   theme_small +
   theme(plot.title = element_text(hjust = 0.3, size = 8, face = "bold"),
         legend.position = "bottom",
-        legend.key.width = unit(2.8, "cm"),
+        legend.key.width = unit(3.8, "cm"),
         legend.key.height = unit(0.4, "cm"), 
-        legend.spacing = unit(0.25,"cm"),
+        legend.spacing = unit(0.35,"cm"),
         legend.text = element_text(size = 12), 
         legend.title = element_text(hjust = 0.5, size = 12),
         legend.justification = "center") +
