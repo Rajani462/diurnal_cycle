@@ -19,20 +19,20 @@ source('./source/palettes.R')
 
 ## read the data sets -------------------------------
 
-#dat_thres_list <- readRDS("./projects/kenya_example/data/output/diurnal_mean_mean_thres_list.RDS")
-data_list <- readRDS("./projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20.rds")
-data_list1 <- readRDS("./projects/main/data/hourly_mean_thres_0.5_all_datasets_LST_glob_2001_20.rds")
+#dat_thres_list <- readRDS("./projects/kenya_example/data/output/diurnal_freq_freq_thres_list.RDS")
+data_list <- readRDS("./projects/main/data/hourly_freq_all_datasets_LST_glob_2001_20.rds")
+data_list1 <- readRDS("./projects/main/data/hourly_freq_thres_0.5_all_datasets_LST_glob_2001_20.rds")
 
 
 merged_list <- lapply(data_list, function(dataset) merge(dataset, rbindlist(data_list1), 
                                                          by = c("lat", "lon", "time_utc", "name", 
                                                                 "location", "tmz_offset", "time_lst")))
 
-saveRDS(merged_list, "./projects/main/data/hourly_mean_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
+saveRDS(merged_list, "./projects/main/data/hourly_freq_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
 
 #restart and read the dataset again to save memory
 
-data_dt <-  readRDS("./projects/main/data/hourly_mean_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
+data_dt <-  readRDS("./projects/main/data/hourly_freq_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
 
 
 
@@ -45,31 +45,32 @@ levels(data_dt$location) <- c("Land", "Ocean")
 
 ### spatial mean plot --------------------------------------
 
-spat_mean_dt <- data_dt[, .('0.1' = round(mean(prec_mean, na.rm = TRUE), 2), 
-                            '0.5' = round(mean(prec_mean_0.5, na.rm = TRUE), 2)), by = .(lat, lon, name)]
+spat_freq_dt <- data_dt[, .('0.1' = round(mean(prec_freq, na.rm = TRUE), 2), 
+                            '0.5' = round(mean(prec_freq_0.5, na.rm = TRUE), 2)), by = .(lat, lon, name)]
 
-summary(spat_mean_dt)
+summary(spat_freq_dt)
 
-spat_mean_dt <- melt(spat_mean_dt, c("lat", "lon", "name"), variable.name = "threshold")
+spat_freq_dt <- melt(spat_freq_dt, c("lat", "lon", "name"), variable.name = "threshold")
 
-ggplot(spat_mean_dt) + 
+ggplot(spat_freq_dt) + 
   geom_raster(aes(lon, lat, fill = value)) +
   scale_fill_binned(type = "viridis", option = "B", direction = -1, 
-                    breaks = c(0.03, 0.06, 0.09, 0.1, 0.3, 0.5, 1, 1.5, 2), show.limits = TRUE) + 
+                    breaks = c(1, 3, 5, 7, 10, 15, 20, 25, 30, 40, 50, 60, 70), show.limits = TRUE) + 
   borders(colour = "black") +
-  coord_cartesian(xlim = c(min(spat_mean_dt$lon), max(spat_mean_dt$lon)), 
-                  ylim = c(min(spat_mean_dt$lat), max(spat_mean_dt$lat))) + 
+  coord_cartesian(xlim = c(min(spat_freq_dt$lon), max(spat_freq_dt$lon)), 
+                  ylim = c(min(spat_freq_dt$lat), max(spat_freq_dt$lat))) + 
   facet_grid(threshold~name) + 
   scale_x_continuous(expand = c(0, 0)) + 
-  labs(x = "", y = "", fill = "Mean\n  \n (mm/hr)") + 
+  labs(x = "", y = "", fill = "Frequency (%)") + 
   #facet_grid(threshold~fct_relevel(name,  "IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")) + 
   theme_generic + 
   theme(strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'), 
-        legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.4, "cm"),
-        legend.key.height = unit(1.0, 'cm'))
+        legend.direction = "horizontal", legend.position = "bottom", legend.key.width = unit(2.4, "cm"),
+        legend.key.height = unit(0.35, 'cm'))
 
-ggsave("./projects/main/results/06a_spat_mean_thres_0.1_0.5.png", width = 11.5, height = 5.3, 
+
+ggsave("./projects/main/results/06b_spat_freq_thres_0.1_0.5.png", width = 11.5, height = 5.3, 
        units = "in", dpi = 600)
 
 
@@ -78,8 +79,8 @@ ggsave("./projects/main/results/06a_spat_mean_thres_0.1_0.5.png", width = 11.5, 
 
 ## for glob
 
-mean_24h_glob <- data_dt[, .('0.1' = mean(prec_mean, na.rm = TRUE), 
-                             '0.5' = mean(prec_mean_0.5, na.rm = TRUE)), by = .(hour(time_lst), name)]
+mean_24h_glob <- data_dt[, .('0.1' = mean(prec_freq, na.rm = TRUE), 
+                             '0.5' = mean(prec_freq_0.5, na.rm = TRUE)), by = .(hour(time_lst), name)]
 
 mean_24h_glob <- melt(mean_24h_glob, c("hour", "name"), variable = "threshold")
 
@@ -87,19 +88,19 @@ ggplot(mean_24h_glob, aes(hour, value, col = name, group = name)) +
   geom_point(size = 0.85) + 
   geom_line() + 
   facet_wrap(~threshold) + 
-  labs(x ="Hour (LST)", y = "Mean (mm/hr)") + 
+  labs(x ="Hour (LST)", y = "Frequency (%)") + 
   theme_generic + 
   theme(legend.title = element_blank(), strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'))
 
-ggsave("./projects/main/results/06a_24hlineplot_mean_thres_0.1_0.5_glob.png",
+ggsave("./projects/main/results/06b_24hlineplot_freq_thres_0.1_0.5_glob.png",
        width = 8.9, height = 5.6, units = "in", dpi = 600)
 
 
 
 
-mean_24h_landocn_seas <- data_dt[, .('0.1' = mean(prec_mean, na.rm = TRUE), 
-                                     '0.5' = mean(prec_mean_0.5, na.rm = TRUE)), by = .(hour(time_lst), name, location)]
+mean_24h_landocn_seas <- data_dt[, .('0.1' = mean(prec_freq, na.rm = TRUE), 
+                                     '0.5' = mean(prec_freq_0.5, na.rm = TRUE)), by = .(hour(time_lst), name, location)]
 
 mean_24h_landocn_seas <- melt(mean_24h_landocn_seas, c("hour", "name", "location"), variable = "threshold")
 
@@ -107,24 +108,24 @@ mean_24h_landocn_seas <- melt(mean_24h_landocn_seas, c("hour", "name", "location
 ggplot(mean_24h_landocn_seas, aes(hour, value, col = name, group = name)) + 
   geom_point(size = 0.85) + 
   geom_line() + 
-  facet_grid(location~threshold) + 
-  labs(x ="Hour (LST)", y = "Mean (mm/hr)") + 
+  facet_grid(threshold~location, scales = "free_y") + 
+  labs(x ="Hour (LST)", y = "Frequency (%)") + 
   theme_generic + 
   theme(legend.title = element_blank(), strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'))
 
-ggsave("./projects/main/results/06a_24hlineplot_mean_thres_0.1_0.5_landocn.png",
+ggsave("./projects/main/results/06b_24hlineplot_freq_thres_0.1_0.5_landocn.png",
        width = 8.9, height = 5.6, units = "in", dpi = 600)
 
 
 ### Estimate the peak hour of data.tables -------------------------------------------
 
-system.time(peak_hour_dt <- data_dt[, .SD[which.max(prec_mean_0.5)], by = .(lat, lon, name)])
+system.time(peak_hour_dt <- data_dt[, .SD[which.max(prec_freq_0.5)], by = .(lat, lon, name)])
 # user  system elapsed 
 # 488.337   2.325 362.277 
-saveRDS(peak_hour_dt, "./projects/main/data/mean_thres_0.5_peak_hour_dt_2001_20.RDS")
+saveRDS(peak_hour_dt, "./projects/main/data/freq_thres_0.5_peak_hour_dt_2001_20.RDS")
 
-peak_hour_dt <- readRDS("./projects/main/data/mean_thres_0.5_peak_hour_dt_2001_20.RDS")
+peak_hour_dt <- readRDS("./projects/main/data/freq_thres_0.5_peak_hour_dt_2001_20.RDS")
 peak_hour_dt[, `:=`(peak_hour = hour(time_lst))]
 peak_hour_dt[, `:=`(time_lst = NULL)]
 # peak_hour_dt[peak_hour  == "1" | peak_hour  == "2" | peak_hour  == "3", peak_hour2 := '1-3']
@@ -159,7 +160,7 @@ ggplot(peak_hour_dt) +
         legend.direction = "vertical", legend.position = "right", legend.key.width = unit(0.5, "cm"),
         legend.key.height = unit(0.9, 'cm'))
 
-ggsave("./projects/main/results/06a_plot_spat_peak_hour_mean_thres_0.5.png", width = 10.5, height = 6.9, 
+ggsave("./projects/main/results/06b_plot_spat_peak_hour_freq_thres_0.5.png", width = 10.5, height = 6.9, 
        units = "in", dpi = 600)
 
 
@@ -181,5 +182,5 @@ ggplot(peak_hour_dt) +
         legend.key.height = unit(0.9, 'cm'))
 
 
-ggsave("./projects/main/results/06a_plot_spat_peak_hour_mean_thres_0.5_clasfy.png", width = 10.5, height = 6.9, 
+ggsave("./projects/main/results/06b_plot_spat_peak_hour_freq_thres_0.5_clasfy.png", width = 10.5, height = 6.9, 
        units = "in", dpi = 600)
