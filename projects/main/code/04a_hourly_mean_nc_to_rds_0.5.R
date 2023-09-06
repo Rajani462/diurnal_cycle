@@ -1,4 +1,3 @@
-# Load required libraries
 library(raster)
 library(data.table)
 library(lubridate)
@@ -17,9 +16,9 @@ file_paths <- character(0)
 # Generate file paths using nested loops and paste0
 
 for (dataset in datasets) {
-    file_name <- paste0("hourly_mean_", dataset, "_0.5")
-    file_path <- paste0("~/shared/data_downloads/input_data/seasonal/hourly_character/", file_name, ".nc")
-    file_paths <- c(file_paths, file_path)
+  file_name <- paste0("hourly_mean_", dataset, "_0.5")
+  file_path <- paste0("~/shared/data_projects/diurnal_precip/processed/", file_name, ".nc")
+  file_paths <- c(file_paths, file_path)
 }
 
 
@@ -49,26 +48,18 @@ extract_dataset_name(file_paths)
 process_dataset <- function(file_path) {
   dataset_name <- extract_dataset_name(file_path)
   
+  dataset <- brick(file_path)
+  
   if (dataset_name == "persiann") {
-    # Additional preprocessing specific to "persiann" dataset
-    persiann <- brick(file_path)
-    pers_time <- getZ(persiann)
+    pers_time <- getZ(dataset)
     posixct_time <- as.POSIXct(pers_time * 3600, origin = "2001-01-01 00:00:00")
-    names(persiann) <- posixct_time
-    
-    # Continue with the main processing steps
-    dataset_dt <- as.data.frame(persiann, xy = TRUE, na.rm = FALSE) %>%
-      as.data.table() %>%
-      data.table::melt(., id.vars = c("x", "y"), variable.name = "date", value.name = "prec_mean_0.5") %>%
-      `[`(, name := factor(dataset_name))
-  } else {
-    # Perform the main processing steps similar to other datasets
-    dataset <- brick(file_path)
-    dataset_dt <- as.data.frame(dataset, xy = TRUE, na.rm = FALSE) %>%
-      as.data.table() %>%
-      data.table::melt(., id.vars = c("x", "y"), variable.name = "date", value.name = "prec_mean_0.5") %>%
-      `[`(, name := factor(dataset_name))
+    names(dataset) <- posixct_time
   }
+  
+  dataset_dt <- as.data.frame(dataset, xy = TRUE, na.rm = TRUE) %>%
+    as.data.table() %>%
+    data.table::melt(., id.vars = c("x", "y"), variable.name = "date", value.name = "prec_mean_0.5") %>%
+    `[`(, name := factor(dataset_name))
   
   return(dataset_dt)
 }
@@ -113,3 +104,4 @@ dat_lst_list <- lapply(merged_list, function(dt) {
 })
 
 saveRDS(dat_lst_list, "./projects/main/data/hourly_mean_thres_0.5_all_datasets_LST_glob_2001_20.rds")
+

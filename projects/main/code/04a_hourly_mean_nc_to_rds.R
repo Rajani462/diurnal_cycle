@@ -9,15 +9,10 @@ library(foreach)
 library(doParallel)
 library(hms)
 
-# Define the file paths for multiple datasets
-file_paths <- c(
-  "./projects/main/data/hourly_mean_imerg_glob_2001_20.nc",
-  "./projects/main/data/hourly_mean_gsmap_glob_2015_20.nc", 
-  "./projects/main/data/hourly_mean_cmorph_glob_2001_20.nc", 
-  "./projects/main/data/hourly_mean_persiann_glob_2001_20.nc", 
-  "./projects/main/data/hourly_mean_era5_glob_2001_20.nc"
-  # Add more file paths for additional datasets as needed
-)
+
+datasets <- c("imerg", "gsmap", "cmorph", "persiann", "era5")
+file_paths <- sprintf("~/shared/data_projects/diurnal_precip/processed/hourly_mean_%s.nc", datasets)
+
 
 # Set the number of cores to use for parallel processing
 num_cores <- detectCores() - 50
@@ -30,7 +25,7 @@ registerDoParallel(cl)
 extract_dataset_name <- function(file_path) {
   # Extract the dataset name after 'hourly_mean_'
   start_index <- regexpr("hourly_mean_", file_path) + nchar("hourly_mean_")
-  end_index <- regexpr("_glob", file_path, fixed = TRUE)
+  end_index <- regexpr(".nc", file_path, fixed = TRUE)
   dataset_name <- substr(file_path, start_index, end_index - 1)
   return(dataset_name)
 }
@@ -48,18 +43,18 @@ process_dataset <- function(file_path) {
     file_datetime <- as.POSIXct(getZ(dataset), origin = "1970-01-01", format = "%Y-%m-%d %H:%M:%S")
     dataset <- setZ(transposed_flipped, file_datetime, 'date')
     names(dataset) <- file_datetime
-  } else if (dataset_name == "gsmap") {
-    transposed_flipped <- flip(t(dataset), direction = "x")
-    file_datetime <- as.POSIXct(getZ(dataset), origin = "1970-01-01", format = "%Y-%m-%d %H:%M:%S")
-    dataset <- setZ(transposed_flipped, file_datetime, 'date')
-    names(dataset) <- file_datetime
+  # } else if (dataset_name == "gsmap") {
+  #   transposed_flipped <- flip(t(dataset), direction = "x")
+  #   file_datetime <- as.POSIXct(getZ(dataset), origin = "1970-01-01", format = "%Y-%m-%d %H:%M:%S")
+  #   dataset <- setZ(transposed_flipped, file_datetime, 'date')
+  #   names(dataset) <- file_datetime
   } else if (dataset_name == "persiann") {
     pers_time <- getZ(dataset)
     posixct_time <- as.POSIXct(pers_time * 3600, origin = "2001-01-01 00:00:00")
     names(dataset) <- posixct_time
   }
   
-  dataset_dt <- as.data.frame(dataset, xy = TRUE, na.rm = TRUE) %>%
+  dataset_dt <- as.data.frame(dataset, xy = TRUE, na.rm = FALSE) %>%
     as.data.table() %>%
     data.table::melt(., id.vars = c("x", "y"), variable.name = "date", value.name = "prec_mean") %>%
     `[`(, name := factor(dataset_name))
@@ -105,11 +100,15 @@ dat_lst_list <- lapply(merged_output_list, function(dt) {
   return(dt)
 })
 
-saveRDS(dat_lst_list, "./projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20.rds")
 
+saveRDS(dat_lst_list, "./projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20.rds")
+#saveRDS(dat_lst_list, "./projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20_temp.rds")
 #################################
 
-
+# peak_hour_dt <- readRDS("./projects/main/data/mean_peak_hour_dt_2001_20.RDS")
+# > peak_hour_dt[, `:=`(peak_hour = hour(time_lst))]
+# > peak_hour_era5 <- unique(peak_hour_dt, by = "lon")
+# > write.csv(peak_hour_era5, "peak_hour_dat.csv")
 
 # for seasonal ------------------------------------------------------------
 
@@ -133,11 +132,11 @@ file_paths <- character(0)
 
 for (dataset in datasets) {
   for (season in seasons) {
-    file_name <- paste0("hourly_mean_", dataset, "_tp_mm_60ns_", ifelse(dataset == "gsmap", "2015_20", "2001_20"), "_025_hourly_", season)
+    file_name <- paste0("hourly_mean_", dataset, "_", season)
     # if (dataset %in% c("imerg", "gsmap")) {
     #   file_name <- paste0(file_name, "_fliptrans")
     # }
-    file_path <- paste0("~/shared/data_downloads/input_data/seasonal/hourly_character/", file_name, ".nc")
+    file_path <- paste0("~/shared/data_projects/diurnal_precip/processed/", file_name, ".nc")
     file_paths <- c(file_paths, file_path)
   }
 }
@@ -155,14 +154,27 @@ registerDoParallel(cl)
 
 # Function to extract the dataset name from the file path
 
+# extract_dataset_name <- function(file_path) {
+#   start_index <- regexpr("hourly_mean_", file_path) + nchar("hourly_mean_")
+#   end_index <- regexpr("_", file_path, fixed = TRUE)
+#   dataset_name <- substr(file_path, start_index, end_index - 1)
+#   return(dataset_name)
+# }
+
+
 extract_dataset_name <- function(file_path) {
+  # Extract the part of the file name that comes after "hourly_mean_"
   start_index <- regexpr("hourly_mean_", file_path) + nchar("hourly_mean_")
-  end_index <- regexpr("_tp", file_path, fixed = TRUE)
-  dataset_name <- substr(file_path, start_index, end_index - 1)
+  sub_path <- substr(file_path, start_index, nchar(file_path))
+  
+  # Extract the dataset name, which is everything before the first underscore
+  end_index <- regexpr("_", sub_path, fixed = TRUE)
+  dataset_name <- substr(sub_path, 1, end_index - 1)
+  
   return(dataset_name)
 }
 
-
+##extract_dataset_name(file_paths)
 
 # Function to extract the season from the file path
 extract_season <- function(file_path) {
@@ -188,18 +200,18 @@ process_dataset <- function(file_path) {
     file_datetime <- as.POSIXct(getZ(dataset), origin = "1970-01-01", format = "%Y-%m-%d %H:%M:%S")
     dataset <- setZ(transposed_flipped, file_datetime, 'date')
     names(dataset) <- file_datetime
-  } else if (dataset_name == "gsmap") {
-    transposed_flipped <- flip(t(dataset), direction = "x")
-    file_datetime <- as.POSIXct(getZ(dataset), origin = "1970-01-01", format = "%Y-%m-%d %H:%M:%S")
-    dataset <- setZ(transposed_flipped, file_datetime, 'date')
-    names(dataset) <- file_datetime
+  # } else if (dataset_name == "gsmap") {
+  #   transposed_flipped <- flip(t(dataset), direction = "x")
+  #   file_datetime <- as.POSIXct(getZ(dataset), origin = "1970-01-01", format = "%Y-%m-%d %H:%M:%S")
+  #   dataset <- setZ(transposed_flipped, file_datetime, 'date')
+  #   names(dataset) <- file_datetime
   } else if (dataset_name == "persiann") {
     pers_time <- getZ(dataset)
     posixct_time <- as.POSIXct(pers_time * 3600, origin = "2001-01-01 00:00:00")
     names(dataset) <- posixct_time
   }
   
-  dataset_dt <- as.data.frame(dataset, xy = TRUE, na.rm = TRUE) %>%
+  dataset_dt <- as.data.frame(dataset, xy = TRUE, na.rm = FALSE) %>%
     as.data.table() %>%
     data.table::melt(., id.vars = c("x", "y"), variable.name = "date", value.name = "prec_mean") %>%
     `[`(, name := factor(dataset_name)) %>%

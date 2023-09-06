@@ -9,15 +9,9 @@ library(foreach)
 library(doParallel)
 library(hms)
 
-# Define the file paths for multiple datasets
-file_paths <- c(
-  "./projects/main/data/hourly/hourly_freq_imerg_glob_0.1_2001_20.nc",
-  "./projects/main/data/hourly/hourly_freq_gsmap_glob_0.1_2015_20.nc", 
-  "./projects/main/data/hourly/hourly_freq_cmorph_glob_0.1_2001_20.nc", 
-  "./projects/main/data/hourly/hourly_freq_persiann_glob_0.1_2001_20.nc", 
-  "./projects/main/data/hourly/hourly_freq_era5_glob_0.1_2001_20.nc"
-  # Add more file paths for additional datasets as needed
-)
+datasets <- c("imerg", "gsmap", "cmorph", "persiann", "era5")
+file_paths <- sprintf("~/shared/data_projects/diurnal_precip/processed/hourly_freq_%s.nc", datasets)
+
 
 # Set the number of cores to use for parallel processing
 num_cores <- detectCores() - 50
@@ -30,7 +24,7 @@ registerDoParallel(cl)
 extract_dataset_name <- function(file_path) {
   # Extract the dataset name after 'hourly_freq_'
   start_index <- regexpr("hourly_freq_", file_path) + nchar("hourly_freq_")
-  end_index <- regexpr("_glob", file_path, fixed = TRUE)
+  end_index <- regexpr(".nc", file_path, fixed = TRUE)
   dataset_name <- substr(file_path, start_index, end_index - 1)
   return(dataset_name)
 }

@@ -18,7 +18,7 @@ file_paths <- character(0)
 
 for (dataset in datasets) {
     file_name <- paste0("hourly_freq_", dataset, "_0.5")
-    file_path <- paste0("~/shared/data_downloads/input_data/seasonal/hourly_character/", file_name, ".nc")
+    file_path <- paste0("~/shared/data_projects/diurnal_precip/processed/", file_name, ".nc")
     file_paths <- c(file_paths, file_path)
 }
 
@@ -51,17 +51,17 @@ process_dataset <- function(file_path) {
   
   dataset <- brick(file_path)
   
-  if (dataset_name == "imerg") {
-    transposed_flipped <- flip(t(dataset), direction = "x")
-    file_datetime <- as.POSIXct(getZ(dataset), origin = "1970-01-01", format = "%Y-%m-%d %H:%M:%S")
-    dataset <- setZ(transposed_flipped, file_datetime, 'date')
-    names(dataset) <- file_datetime
-  } else if (dataset_name == "gsmap") {
-    transposed_flipped <- flip(t(dataset), direction = "x")
-    file_datetime <- as.POSIXct(getZ(dataset), origin = "1970-01-01", format = "%Y-%m-%d %H:%M:%S")
-    dataset <- setZ(transposed_flipped, file_datetime, 'date')
-    names(dataset) <- file_datetime
-  } else if (dataset_name == "persiann") {
+  # if (dataset_name == "imerge") {
+    # transposed_flipped <- flip(t(dataset), direction = "x")
+    # file_datetime <- as.POSIXct(getZ(dataset), origin = "1970-01-01", format = "%Y-%m-%d %H:%M:%S")
+    # dataset <- setZ(transposed_flipped, file_datetime, 'date')
+    # names(dataset) <- file_datetime
+  # } else if (dataset_name == "gsmap") {
+  #   transposed_flipped <- flip(t(dataset), direction = "x")
+  #   file_datetime <- as.POSIXct(getZ(dataset), origin = "1970-01-01", format = "%Y-%m-%d %H:%M:%S")
+  #   dataset <- setZ(transposed_flipped, file_datetime, 'date')
+  #   names(dataset) <- file_datetime
+   if (dataset_name == "persiann") {
     pers_time <- getZ(dataset)
     posixct_time <- as.POSIXct(pers_time * 3600, origin = "2001-01-01 00:00:00")
     names(dataset) <- posixct_time

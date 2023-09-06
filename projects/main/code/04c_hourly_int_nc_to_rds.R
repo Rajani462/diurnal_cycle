@@ -10,14 +10,9 @@ library(doParallel)
 library(hms)
 
 # Define the file paths for multiple datasets
-file_paths <- c(
-  "./projects/main/data/hourly_int_imerg_glob_0.1_2001_20.nc",
-  "./projects/main/data/hourly_int_gsmap_glob_0.1_2015_20.nc", 
-  "./projects/main/data/hourly_int_cmorph_glob_0.1_2001_20.nc", 
-  "./projects/main/data/hourly_int_persiann_glob_0.1_2001_20.nc", 
-  "./projects/main/data/hourly_int_era5_glob_0.1_2001_20.nc"
-  # Add more file paths for additional datasets as needed
-)
+datasets <- c("imerg", "gsmap", "cmorph", "persiann", "era5")
+file_paths <- sprintf("~/shared/data_projects/diurnal_precip/processed/hourly_int_%s.nc", datasets)
+
 
 # Set the number of cores to use for parallel processing
 num_cores <- detectCores() - 50
@@ -30,7 +25,7 @@ registerDoParallel(cl)
 extract_dataset_name <- function(file_path) {
   # Extract the dataset name after 'hourly_int_'
   start_index <- regexpr("hourly_int_", file_path) + nchar("hourly_int_")
-  end_index <- regexpr("_glob", file_path, fixed = TRUE)
+  end_index <- regexpr(".nc", file_path, fixed = TRUE)
   dataset_name <- substr(file_path, start_index, end_index - 1)
   return(dataset_name)
 }
@@ -44,11 +39,6 @@ process_dataset <- function(file_path) {
   dataset <- brick(file_path)
   
   if (dataset_name == "imerg") {
-    transposed_flipped <- flip(t(dataset), direction = "x")
-    file_datetime <- as.POSIXct(getZ(dataset), origin = "1970-01-01", format = "%Y-%m-%d %H:%M:%S")
-    dataset <- setZ(transposed_flipped, file_datetime, 'date')
-    names(dataset) <- file_datetime
-  } else if (dataset_name == "gsmap") {
     transposed_flipped <- flip(t(dataset), direction = "x")
     file_datetime <- as.POSIXct(getZ(dataset), origin = "1970-01-01", format = "%Y-%m-%d %H:%M:%S")
     dataset <- setZ(transposed_flipped, file_datetime, 'date')
