@@ -42,6 +42,7 @@ ggplot(zonal_data_comb[precip < 0.4], aes(lat, precip, col = name), size = 0.5) 
 ggsave("./projects/main/results/07_zonal_mean_lineplot_thres_0.1_0.5.png",
       width = 9.0, height = 5.2, units = "in", dpi = 600)
 
+
 ggplot(zonal_data_comb[precip < 0.4 & threshold == "no threshold"], aes(lat, precip, col = name), size = 0.5) + 
   geom_line() + 
   scale_color_manual(values = line_colors) + 
@@ -54,6 +55,21 @@ ggplot(zonal_data_comb[precip < 0.4 & threshold == "no threshold"], aes(lat, pre
 ggsave("./projects/main/results/07_zonal_mean_lineplot.png",
        width = 9.0, height = 4.8, units = "in", dpi = 600)
 
+
+ggplot(zonal_data_comb[precip < 0.4 & threshold == "no threshold"], aes(lat, precip, col = name), size = 0.5) + 
+  geom_line() + 
+  scale_color_manual(values = line_colors) + 
+  labs(x = "Latitude", y = "Precipitation (mm/hour)", col = " ") + 
+  theme_generic + 
+  #facet_wrap(~threshold) + 
+  coord_flip() + 
+  scale_x_continuous(breaks = seq(-60, 60, by=10), expand = c(0, 0)) + 
+  theme(strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'), legend.position = "right", legend.direction = "vertical") + 
+  theme(legend.position = c(0.8, 0.2))
+
+ggsave("./projects/main/results/07_zonal_mean_lineplot_flip.png",
+       width = 4.5, height = 8.8, units = "in", dpi = 600)
 
 # seasonal ----------------------------------------------------------------
 
