@@ -57,7 +57,7 @@ levels(to_plot$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
 summary(to_plot)
 to_plot[name == "PERSIANN" & value > 100]
 to_plot[value > 20]
-
+to_plot[value > 15]
 ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "white", size = 0.25) +
@@ -100,6 +100,7 @@ mean_24h_glob <- data_dt[, .(mean_value = mean(prec_int, na.rm = TRUE)), by = .(
 ggplot(mean_24h_glob, aes(hour, mean_value, col = name, group = name)) + 
   geom_point(size = 0.85) + 
   geom_line() + 
+  scale_color_manual(values = line_colors) + 
   #facet_wrap(~location) + 
   labs(x ="Hour (LST)", y = "Frequency (mm/hr)") + 
   theme_generic + 
@@ -116,6 +117,7 @@ mean_24h_landocn <- data_dt[, .(mean_value = mean(prec_int, na.rm = TRUE)), by =
 ggplot(mean_24h_landocn, aes(hour, mean_value, col = name, group = name)) + 
   geom_point(size = 0.85) + 
   geom_line() + 
+  scale_color_manual(values = line_colors) + 
   facet_wrap(~location) + 
   labs(x ="Hour (LST)", y = "Mean (mm/hr)") + 
   theme_generic + 
@@ -144,8 +146,20 @@ ggplot(land_ocn_glob, aes(hour, mean_value, col = name, group = name)) +
         strip.text = element_text(colour = 'Black'))
 
 ggsave("./projects/main/results/06c_24hlineplot_int_landocnglob.png",
-       width = 8.9, height = 4.6, units = "in", dpi = 600)
+       width = 9.6, height = 4.3, units = "in", dpi = 600)
 
+ggplot(land_ocn_glob, aes(hour, mean_value, col = name, group = name)) + 
+  geom_point(size = 0.85) + 
+  geom_line() + 
+  scale_color_manual(values = line_colors) + 
+  facet_wrap(~location, ncol = 1) + 
+  labs(x ="Hour (LST)", y = "Intensity (mm/hr)") + 
+  theme_generic + 
+  theme(legend.title = element_blank(), legend.position = "right", legend.direction = "vertical", strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'))
+
+ggsave("./projects/main/results/06c_24hlineplot_int_landocnglob_2.png",
+       width = 7.6, height = 5.3, units = "in", dpi = 600)
 
 ### Estimate the peak hour of data.tables -------------------------------------------
 

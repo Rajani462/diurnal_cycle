@@ -21,26 +21,23 @@ source('./source/graphics.R')
 ## read the data sets -------------------------------
 
 #dat_thres_list <- readRDS("./projects/kenya_example/data/output/diurnal_int_int_thres_list.RDS")
-data_list <- readRDS("./projects/main/data/hourly_int_all_datasets_LST_glob_2001_20.rds")
-data_list1 <- readRDS("./projects/main/data/hourly_int_thres_0.2_0.5_all_datasets_LST_glob_2001_20.rds")
+#data_list <- readRDS("./projects/main/data/hourly_int_all_datasets_LST_glob_2001_20.rds")
+data_list <- readRDS("./projects/main/data/hourly_int_thres_0.2_0.5_all_datasets_LST_glob_2001_20.rds")
 
 
-merged_list <- lapply(data_list, function(dataset) merge(dataset, rbindlist(data_list1), 
-                                                         by = c("lat", "lon", "time_utc", "name", 
-                                                                "location", "tmz_offset", "time_lst")))
+# merged_list <- lapply(data_list, function(dataset) merge(dataset, rbindlist(data_list1), 
+#                                                          by = c("lat", "lon", "time_utc", "name", 
+#                                                                 "location", "tmz_offset", "time_lst")))
+# 
+# saveRDS(merged_list, "./projects/main/data/hourly_int_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
+# 
+# #restart and read the dataset again to save memory
+# 
+# data_list <-  readRDS("./projects/main/data/hourly_int_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
 
-saveRDS(merged_list, "./projects/main/data/hourly_int_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
-
-#restart and read the dataset again to save memory
-
-data_list <-  readRDS("./projects/main/data/hourly_int_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
 
 
 
-data_dt <- rbindlist(data_list)
-data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
-levels(data_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
-levels(data_dt$location) <- c("Land", "Ocean")
 
 ## Pre-process ----------------------------------------------
 
@@ -147,13 +144,19 @@ ggsave("./projects/main/results/06a_spat_mean_thres_0.1_0.5_robin.png", width = 
 
 ### 24hr diurnal cycle line plot ---------------------------------------------------------------------
 
+data_dt <- rbindlist(data_list)
+data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
+levels(data_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
+levels(data_dt$location) <- c("Land", "Ocean")
 ## for glob seasons
 
-mean_24h_glob <- data_dt[, .(prec_int_0.1 = mean(prec_int, na.rm = TRUE), 
+mean_24h_glob <- data_dt[, .(prec_int_0.1 = mean(prec_int_0.1, na.rm = TRUE), 
                              prec_int_0.2 = mean(prec_int_0.2, na.rm = TRUE), 
                              prec_int_0.5 = mean(prec_int_0.5, na.rm = TRUE)), by = .(hour(time_lst), name)]
 
 mean_24h_glob_plot <- melt(mean_24h_glob, c("hour", "name"), variable.name = "threshold")
+
+levels(mean_24h_glob_plot$threshold) <- c("0.1 (mm/hr)", "0.2 (mm/hr)", "0.5 (mm/hr)")
 
 ggplot(mean_24h_glob_plot, aes(hour, value, col = name, group = name)) + 
   geom_point(size = 0.85) + 
@@ -165,33 +168,38 @@ ggplot(mean_24h_glob_plot, aes(hour, value, col = name, group = name)) +
   theme(legend.title = element_blank(), strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'))
 
-ggsave("./projects/main/results/06a_24hlineplot_mean_thres_0.1_0.5_glob.png",
-       width = 8.9, height = 5.6, units = "in", dpi = 600)
 
 ggsave("./projects/main/results/06c_24hlineplot_int_thres_0.1_0.5_glob.png",
-       width = 8.9, height = 5.6, units = "in", dpi = 600)
+       width = 9.9, height = 4.6, units = "in", dpi = 600)
 
 
 
 
-mean_24h_landocn_seas <- data_dt[, .('0.1' = mean(prec_int, na.rm = TRUE), 
-                                     '0.5' = mean(prec_int_0.5, na.rm = TRUE)), by = .(hour(time_lst), name, location)]
+## for land, ocean and Global
 
-mean_24h_landocn_seas <- melt(mean_24h_landocn_seas, c("hour", "name", "location"), variable = "threshold")
+mean_24h_landocn <- data_dt[, .(#prec_int_0.0 = mean(prec_int, na.rm = TRUE), 
+                                prec_int_0.1 = mean(prec_int_0.1, na.rm = TRUE),
+                                prec_int_0.2 = mean(prec_int_0.2, na.rm = TRUE), 
+                                prec_int_0.5 = mean(prec_int_0.5, na.rm = TRUE)), by = .(hour(time_lst), name, location)]
+mean_24h_glob_2 <- mean_24h_glob[, .(hour, name, location = factor("Global"), prec_int_0.1, prec_int_0.2, prec_int_0.5)]
+
+land_ocn_glob <- rbind(mean_24h_glob_2, mean_24h_landocn)
+mean_24h_glob_plot <- melt(land_ocn_glob, c("hour", "name", "location"), variable.name = "threshold")
+levels(mean_24h_glob_plot$threshold) <- c("0.1 (mm/hr)", "0.2 (mm/hr)", "0.5 (mm/hr)")
 
 
-ggplot(mean_24h_landocn_seas, aes(hour, value, col = name, group = name)) + 
+ggplot(mean_24h_glob_plot, aes(hour, value, col = name, group = name)) + 
   geom_point(size = 0.85) + 
   geom_line() + 
+  scale_color_manual(values = line_colors) + 
   facet_grid(location~threshold) + 
   labs(x ="Hour (LST)", y = "Intensity (mm/hr)") + 
   theme_generic + 
-  theme(legend.title = element_blank(), strip.background = element_rect(fill = "white"),
+  theme(legend.title = element_blank(), legend.position = "bottom", strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'))
 
-ggsave("./projects/main/results/06c_24hlineplot_int_thres_0.1_0.5_landocn.png",
-       width = 8.9, height = 5.6, units = "in", dpi = 600)
-
+ggsave("./projects/main/results/06c_24hlineplot_int_thres_0.1_0.5_landocnglob.png",
+       width = 9.3, height = 5.3, units = "in", dpi = 600)
 
 ### Estimate the peak hour of data.tables -------------------------------------------
 
