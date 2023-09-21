@@ -127,6 +127,7 @@ ggplot(mean_24h_landocn, aes(hour, mean_value, col = name, group = name)) +
 ggsave("./projects/main/results/06c_24hlineplot_int_landocn.png",
        width = 8.9, height = 5.6, units = "in", dpi = 600)
 
+
 ## for land, ocean and global
 
 mean_24h_landocn <- data_dt[, .(mean_value = mean(prec_int, na.rm = TRUE)), by = .(hour(time_lst), name, location)]
@@ -186,47 +187,50 @@ saveRDS(peak_hour_list, "./projects/main/data/int_peak_hour_dt_2001_20.RDS")
 peak_hour_list <- readRDS("./projects/main/data/int_peak_hour_dt_2001_20.RDS")
 
 peak_hour_list <- lapply(peak_hour_list, function(df) {
-  df[, c("lon", "lat", "time_lst")][, time_lst := (hour(time_lst))]
+  df[, c("lon", "lat", "time_lst", "name")][, time_lst := (hour(time_lst))]
 })
 
+
+imerg <- peak_hour_list$imerg
+
+# comb <- rbind(persiann_raw, imerg)
+# comb_uniq <- unique(comb, by = c("lat", "lon"))
+# comb_uniq[name == "IMERG"]
+# comb_uniq[is.na(clusters), name := "PERSIANN"]
+
+#Filling missing pixels (lat, lon) with NA's
+peak_hour_list$gsmap <- rbind(peak_hour_list$gsmap, imerg)
+peak_hour_list$gsmap <- unique(peak_hour_list$gsmap, by = c("lat", "lon"))
+peak_hour_list$gsmap <- peak_hour_list$gsmap[name == "imerg", time_lst := NA]
+peak_hour_list$gsmap[is.na(peak_hour_list$gsmap$time_lsts), "name"] <- "gsmap"
+
+peak_hour_list$persiann <- rbind(peak_hour_list$persiann, imerg)
+peak_hour_list$persiann <- unique(peak_hour_list$persiann, by = c("lat", "lon"))
+peak_hour_list$persiann <- peak_hour_list$persiann[name == "imerg", time_lst := NA]
+peak_hour_list$persiann[is.na(peak_hour_list$persiann$time_lsts), "name"] <- "persiann"
+
+peak_hour_list$cmorph <- rbind(peak_hour_list$cmorph, imerg)
+peak_hour_list$cmorph <- unique(peak_hour_list$cmorph, by = c("lat", "lon"))
+peak_hour_list$cmorph <- peak_hour_list$cmorph[name == "imerg", time_lsts := NA]
+peak_hour_list$cmorph[is.na(peak_hour_list$cmorph$time_lsts), "name"] <- "cmorph"
+
+extracted_data_list <- lapply(peak_hour_list, function(df) df[, c("lon", "lat", "time_lst")])
 
 # Use lapply to create a list of rasters
-raster_list <- lapply(peak_hour_list, create_raster)
-#raster_brick <- brick(raster_list)
+raster_list <- lapply(extracted_data_list, create_raster)
+raster_brick <- brick(raster_list)
 
 PROJ <- "+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
-#rastlist_robin <- projectRaster(raster_list, crs = PROJ, method="ngb")
-
-rastlist_robin <- lapply(raster_list, function(raster_obj) {
-  projectRaster(raster_obj, crs = PROJ, method = "ngb")
-})
-
+rastlist_robin <- projectRaster(raster_brick, crs = PROJ, method="ngb")
 
 # Convert spatial data to data frame
-rast_robin_list <- lapply(rastlist_robin, function(raster_obj) {
-  raster_sp <- as(raster_obj, "SpatialPixelsDataFrame")
-  raster_df <- as.data.frame(raster_sp)
-  return(as.data.table(raster_df))
-})
+rast_robin_sp <- as(rastlist_robin, "SpatialPixelsDataFrame")
+rast_robin_df <- as.data.frame(rast_robin_sp) %>% as.data.table()
 
+to_plot <- melt(rast_robin_df, c("x", "y"), variable.name = "name")
+to_plot2 <- to_plot[, .(x, y, peak_hour = value), name]
 
-rast_robin_list <- lapply(names(rastlist_robin), function(name) {
-  raster_obj <- rastlist_robin[[name]]
-  raster_sp <- as(raster_obj, "SpatialPixelsDataFrame")
-  raster_df <- as.data.frame(raster_sp)
-  raster_df$name <- as.factor(name)
-  return(as.data.table(raster_df))
-})
-
-
-rast_robin_df <- rbindlist(rast_robin_list)
-# rast_robin_sp <- as(rastlist_robin, "SpatialPixelsDataFrame")
-# rast_robin_df <- as.data.frame(rast_robin_sp) %>% as.data.table()
-
-to_plot <- melt(rast_robin_df, c("x", "y", "name"))
-peak_hour_dt <- to_plot[, .(x, y, peak_hour = value), name]
-
-levels(peak_hour_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
+levels(to_plot2$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
 
 
 library(RColorBrewer)
@@ -237,7 +241,7 @@ ggplot() +
   geom_polygon(data = NE_box_rob, aes(x = long, y = lat), colour = "black", fill = "transparent", size = 0.25) +
   geom_path(data = NE_graticules_rob, aes(long, lat, group = group), linetype = "dotted", color = "grey50", size = 0.25) +
   coord_fixed(ratio = 1) +
-  geom_tile(data = peak_hour_dt[name != "PERSIANN"], aes(x = x, y = y, fill = peak_hour), alpha = 1) + 
+  geom_tile(data = to_plot2, aes(x = x, y = y, fill = peak_hour), alpha = 1) + 
   #scale_fill_manual(values = rainbow(24)) + 
   
   scale_fill_stepsn(colours = brewer.pal(8,"Spectral"),
