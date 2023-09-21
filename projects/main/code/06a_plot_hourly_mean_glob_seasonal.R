@@ -23,13 +23,6 @@ source('./source/graphics.R')
 
 data_list <- readRDS("./projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20_seasonal.rds")
 
-data_dt <- rbindlist(data_list)
-data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
-levels(data_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
-levels(data_dt$season) <- c("JJA", "DJF")
-levels(data_dt$location) <- c("Land", "Ocean")
-
-## Pre-process ----------------------------------------------
 
 ### spatial mean plot --------------------------------------
 
@@ -70,6 +63,8 @@ to_plot$name <- factor(to_plot$name, levels = desired_order)
 
 levels(to_plot$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
 summary(to_plot)
+hist(to_plot$value)
+to_plot[value >= 2.5]
 
 ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
@@ -82,7 +77,7 @@ ggplot() +
   geom_tile(data = to_plot, aes(x = x, y = y, fill = value), alpha = 1) + 
   facet_grid(season~name) + 
   scale_fill_binned(type = "viridis", option = "B", direction = -1,
-                    breaks = c(0.02, 0.04, 0.06, 0.08, 0.1, 0.5, 1, 1.5, 2), show.limits = TRUE) + 
+                    breaks = c(0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6), show.limits = TRUE) + 
   labs(x = NULL, y = NULL, fill = "Mean (mm/hr)") + 
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "transparent", size = 0.25) +
@@ -107,6 +102,13 @@ ggsave("./projects/main/results/06a_spat_mean_seasonal.png", width = 11.5, heigh
 
 ### 24hr diurnal cycle line plot ---------------------------------------------------------------------
 
+## Pre-process ----------------------------------------------
+data_dt <- rbindlist(data_list)
+data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
+levels(data_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
+levels(data_dt$season) <- c("JJA", "DJF")
+levels(data_dt$location) <- c("Land", "Ocean")
+
 ## for glob seasons
 
 mean_24h_glob_seas <- data_dt[, .(mean_value = mean(prec_mean, na.rm = TRUE)), by = .(hour(time_lst), name, season)]
@@ -114,6 +116,7 @@ mean_24h_glob_seas <- data_dt[, .(mean_value = mean(prec_mean, na.rm = TRUE)), b
 ggplot(mean_24h_glob_seas, aes(hour, mean_value, col = name, group = name)) + 
   geom_point(size = 0.85) + 
   geom_line() + 
+  scale_color_manual(values = line_colors) + 
   facet_wrap(~season) + 
   labs(x ="Hour (LST)", y = "Mean (mm/hr)") + 
   theme_generic + 
@@ -131,6 +134,7 @@ mean_24h_landocn_seas <- data_dt[, .(mean_value = mean(prec_mean, na.rm = TRUE))
 ggplot(mean_24h_landocn_seas, aes(hour, mean_value, col = name, group = name)) + 
   geom_point(size = 0.85) + 
   geom_line() + 
+  scale_color_manual(values = line_colors) + 
   facet_grid(location~season) + 
   labs(x ="Hour (LST)", y = "Mean (mm/hr)") + 
   theme_generic + 

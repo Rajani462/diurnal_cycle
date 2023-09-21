@@ -38,11 +38,12 @@ data_list <-  readRDS("./projects/main/data/hourly_mean_thres_0.1_0.5_all_datase
 ## Pre-process ----------------------------------------------
 
 ### spatial mean plot --------------------------------------
-mean_data_list <- lapply(data_list, function(df) df[, .('0.1' = round(mean(prec_mean, na.rm = TRUE), 2), 
+mean_data_list <- lapply(data_list, function(df) df[, .('0.0' = round(mean(prec_mean, na.rm = TRUE), 2), 
+                                                        '0.1' = round(mean(prec_mean_0.1, na.rm = TRUE), 2),
                                                         '0.2' = round(mean(prec_mean_0.2, na.rm = TRUE), 2),
                                                         '0.5' = round(mean(prec_mean_0.5, na.rm = TRUE), 2)), by = .(lat, lon, name)])
 
-extracted_data_list <- lapply(mean_data_list, function(df) df[, c("lon", "lat", "0.1", "0.2", "0.5")])
+extracted_data_list <- lapply(mean_data_list, function(df) df[, c("lon", "lat", "0.0", "0.1", "0.2", "0.5")])
 
 # Use lapply to create a list of rasters
 raster_list <- lapply(extracted_data_list, create_raster)
@@ -50,8 +51,8 @@ raster_brick <- brick(raster_list)
 raster_list <- as.list(raster_brick)
 
 
-new_names <- c("imerg_0.1", "imerg_0.2", "imerg_0.5", "gsmap_0.1", "gsmap_0.2", "gsmap_0.5", "cmorph_0.1", "cmorph_0.2", 
-               "cmorph_0.5", "persiann_0.1", "persiann_0.2", "persiann_0.5", "era5_0.1", "era5_0.2", "era5_0.5")
+new_names <- c("imerg_0.0", "imerg_0.1", "imerg_0.2", "imerg_0.5", "gsmap_0.0","gsmap_0.1", "gsmap_0.2", "gsmap_0.5", "cmorph_0.0", "cmorph_0.1", "cmorph_0.2", 
+               "cmorph_0.5", "persiann_0.0", "persiann_0.1", "persiann_0.2", "persiann_0.5", "era5_0.0", "era5_0.1", "era5_0.2", "era5_0.5")
 names(raster_list) <- new_names
 
 PROJ <- "+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
@@ -97,7 +98,7 @@ to_plot$name <- factor(to_plot$name, levels = dataset_desired_order)
 
 levels(to_plot$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
 #levels(to_plot$season) <- c("JJA", "DJF")
-levels(to_plot$threshold) <- c("0.1 (mm/hr)", "0.2 (mm/hr)", "0.5 (mm/hr)")
+levels(to_plot$threshold) <- c("no threshold", "0.1 (mm/hr)", "0.2 (mm/hr)", "0.5 (mm/hr)")
 
 to_plot[value < 0] #soame negative values generated in the projectraster()
 #to_plot[value < 0, value := 0]
@@ -114,7 +115,7 @@ ggplot() +
   geom_tile(data = to_plot, aes(x = x, y = y, fill = value), alpha = 1) + 
   facet_grid(threshold~name) + 
   scale_fill_binned(type = "viridis", option = "B", direction = -1,
-                    breaks = c(0.02, 0.04, 0.06, 0.08, 0.1, 0.5, 1, 1.5, 2), show.limits = TRUE) + 
+                    breaks = c(0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6), show.limits = TRUE) + 
   labs(x = NULL, y = NULL, fill = "Mean (mm/hr)") + 
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "transparent", size = 0.25) +
@@ -133,7 +134,7 @@ ggplot() +
   guides(fill=guide_coloursteps(title.position="top"))
 
 
-ggsave("./projects/main/results/06a_spat_mean_thres_0.1_0.5_robin.png", width = 11.5, height = 5.3, 
+ggsave("./projects/main/results/06a_spat_mean_thres_0.1_0.5_robin.png", width = 11.5, height = 6.0, 
        units = "in", dpi = 600)
 
 
@@ -146,12 +147,13 @@ levels(data_dt$location) <- c("Land", "Ocean")
 
 ## for glob seasons
 
-mean_24h_glob <- data_dt[, .(prec_mean_0.1 = mean(prec_mean, na.rm = TRUE), 
+mean_24h_glob <- data_dt[, .(prec_mean_0.0 = mean(prec_mean, na.rm = TRUE), 
+                             prec_mean_0.1 = mean(prec_mean_0.1, na.rm = TRUE),
                                   prec_mean_0.2 = mean(prec_mean_0.2, na.rm = TRUE), 
                                   prec_mean_0.5 = mean(prec_mean_0.5, na.rm = TRUE)), by = .(hour(time_lst), name)]
 
 mean_24h_glob_plot <- melt(mean_24h_glob, c("hour", "name"), variable.name = "threshold")
-levels(mean_24h_glob_plot$threshold) <- c("0.1 (mm/hr)", "0.2 (mm/hr)", "0.5 (mm/hr)")
+levels(mean_24h_glob_plot$threshold) <- c("no threshold", "0.1 (mm/hr)", "0.2 (mm/hr)", "0.5 (mm/hr)")
 
 ggplot(mean_24h_glob_plot, aes(hour, value, col = name, group = name)) + 
   geom_point(size = 0.85) + 
@@ -170,14 +172,15 @@ ggsave("./projects/main/results/06a_24hlineplot_mean_thres_0.1_0.5_glob.png",
 
 ## for land, ocean and Global
 
-mean_24h_landocn <- data_dt[, .(prec_mean_0.1 = mean(prec_mean, na.rm = TRUE), 
+mean_24h_landocn <- data_dt[, .(prec_mean_0.0 = mean(prec_mean, na.rm = TRUE), 
+                                prec_mean_0.1 = mean(prec_mean_0.1, na.rm = TRUE),
                                 prec_mean_0.2 = mean(prec_mean_0.2, na.rm = TRUE), 
                                 prec_mean_0.5 = mean(prec_mean_0.5, na.rm = TRUE)), by = .(hour(time_lst), name, location)]
-mean_24h_glob_2 <- mean_24h_glob[, .(hour, name, location = factor("Global"), prec_mean_0.1, prec_mean_0.2, prec_mean_0.5)]
+mean_24h_glob_2 <- mean_24h_glob[, .(hour, name, location = factor("Global"), prec_mean_0.0, prec_mean_0.1, prec_mean_0.2, prec_mean_0.5)]
 
 land_ocn_glob <- rbind(mean_24h_glob_2, mean_24h_landocn)
 mean_24h_glob_plot <- melt(land_ocn_glob, c("hour", "name", "location"), variable.name = "threshold")
-levels(mean_24h_glob_plot$threshold) <- c("0.1 (mm/hr)", "0.2 (mm/hr)", "0.5 (mm/hr)")
+levels(mean_24h_glob_plot$threshold) <- c("no threshold", "0.1 (mm/hr)", "0.2 (mm/hr)", "0.5 (mm/hr)")
 
 
 ggplot(mean_24h_glob_plot, aes(hour, value, col = name, group = name)) + 
@@ -191,7 +194,7 @@ ggplot(mean_24h_glob_plot, aes(hour, value, col = name, group = name)) +
         strip.text = element_text(colour = 'Black'))
 
 ggsave("./projects/main/results/06a_24hlineplot_mean_thres_0.1_0.5_landocnglob.png",
-       width = 8.9, height = 5.6, units = "in", dpi = 600)
+       width = 9.3, height = 5.3, units = "in", dpi = 600)
 
 
 ### Estimate the peak hour of data.tables -------------------------------------------

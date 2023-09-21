@@ -22,10 +22,6 @@ source('./source/graphics.R')
 #dat_thres_list <- readRDS("./projects/kenya_example/data/output/diurnal_int_freq_thres_list.RDS")
 data_list <- readRDS("./projects/main/data/hourly_freq_all_datasets_LST_glob_2001_20.rds")
 
-data_dt <- rbindlist(data_list)
-data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
-levels(data_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
-levels(data_dt$location) <- c("Land", "Ocean")
 
 ## Pre-process ----------------------------------------------
 
@@ -88,6 +84,10 @@ ggsave("./projects/main/results/06b_spat_freq.png", width = 10.5, height = 5.1,
 
 ### 24hr diurnal cycle line plot ---------------------------------------------------------------------
 
+data_dt <- rbindlist(data_list)
+data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
+levels(data_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
+levels(data_dt$location) <- c("Land", "Ocean")
 ## for glob
 
 mean_24h_glob <- data_dt[, .(mean_value = mean(prec_freq, na.rm = TRUE)), by = .(hour(time_lst), name)]
@@ -124,8 +124,8 @@ ggplot(land_ocn_glob, aes(hour, mean_value, col = name, group = name)) +
   theme(legend.title = element_blank(), legend.position = "bottom", strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'))
 
-ggsave("./projects/main/results/06a_24hlineplot_freq_landocnglob.png",
-       width = 8.9, height = 4.6, units = "in", dpi = 600)
+ggsave("./projects/main/results/06b_24hlineplot_freq_landocnglob.png",
+       width = 9.6, height = 4.3, units = "in", dpi = 600)
 
 
 

@@ -8,6 +8,7 @@ library(dplyr)
 #library(terra)
 library(ncdf4)
 library(sf)
+library(sp)
 library(hms)
 library(forcats)
 library(parallel)
@@ -23,13 +24,8 @@ source('source/graphics.R')
 #dat_thres_list <- readRDS("./projects/kenya_example/data/output/diurnal_int_mean_thres_list.RDS")
 data_list <- readRDS("./projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20.rds")
 
-data_dt <- rbindlist(data_list)
-data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
-levels(data_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
-levels(data_dt$location) <- c("Land", "Ocean")
 
 ## Pre-process ----------------------------------------------
-
 ### spatial mean plot --------------------------------------
 mean_data_list <- lapply(data_list, function(df) df[, .(mean_value = round(mean(prec_mean, na.rm = TRUE), 2)), by = .(lat, lon, name)])
 
@@ -52,6 +48,7 @@ to_plot <- to_plot[, .(x, y, value = round(value, 2), name)]
 levels(to_plot$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
 summary(to_plot)
 
+hist(to_plot$value)
 ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "white", size = 0.25) +
@@ -63,7 +60,7 @@ ggplot() +
   geom_tile(data = to_plot, aes(x = x, y = y, fill = value), alpha = 1) + 
   facet_wrap(~name, ncol = 3) + 
   scale_fill_binned(type = "viridis", option = "B", direction = -1,
-                    breaks = c(0.02, 0.04, 0.06, 0.08, 0.1, 0.5, 1, 1.5, 2), show.limits = TRUE) + 
+                    breaks = c(0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6), show.limits = TRUE) + 
   labs(x = NULL, y = NULL, fill = "Mean (mm/hr)") + 
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "transparent", size = 0.25) +
@@ -87,8 +84,11 @@ ggsave("./projects/main/results/06a_spat_mean.png", width = 10.5, height = 5.1,
 
 ### 24hr diurnal cycle line plot ---------------------------------------------------------------------
 
+data_dt <- rbindlist(data_list)
+data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
+levels(data_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
+levels(data_dt$location) <- c("Land", "Ocean")
 ## for glob
-
 
 mean_24h_glob <- data_dt[, .(mean_value = mean(prec_mean, na.rm = TRUE)), by = .(hour(time_lst), name)]
 
@@ -125,7 +125,7 @@ ggplot(land_ocn_glob, aes(hour, mean_value, col = name, group = name)) +
         strip.text = element_text(colour = 'Black'))
 
 ggsave("./projects/main/results/06a_24hlineplot_mean_landocnglob.png",
-       width = 8.9, height = 4.6, units = "in", dpi = 600)
+       width = 10.6, height = 4.2, units = "in", dpi = 600)
 
 ### Estimate the peak hour of data.tables -------------------------------------------
 
@@ -205,3 +205,24 @@ ggsave("./projects/main/results/06a_plot_spat_peak_hour_mean.png", width = 10.5,
 
 
 ###############################################################
+
+
+library(fst)
+write_fst(dat_lst_list, "./projects/main/data/trial_2001_20.rds")
+#extras------------------
+#box plot
+to_plot <- data_dt[, .(mean_value = mean(prec_mean, na.rm = TRUE)), by = .(lat, lon, name, location)]
+
+ggplot(to_plot, aes(name, mean_value, fill = location)) + 
+  geom_boxplot() + 
+  labs(x = "", y = "Mean (mm/hr)", fill = "") + 
+  theme_small 
+
+
+to_plot_hourly <- data_dt[, .(mean_value = mean(prec_mean, na.rm = TRUE)), by = .(lat, lon, hour(time_lst), name, location)]
+
+ggplot(to_plot_hourly, aes(factor(hour), mean_value, fill = name)) + 
+  geom_boxplot() + 
+  labs(x = "", y = "Mean (mm/hr)", fill = "") + 
+  facet_wrap(~location, nrow = 2) + 
+  theme_small
