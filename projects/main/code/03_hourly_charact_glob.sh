@@ -21,6 +21,30 @@ for input_file in "$input_dir"/*.nc; do
     cdo -b 32 -P 50 -timmean -zonmean "$input_file" "${output_dir}/$output_file"
 done
 
+#for any single data
+cdo -b 32 -P 50 -timmean -zonmean ~/shared/data_projects/diurnal_precip/input_data/cmorph ~/shared/data_projects/diurnal_precip/processed/lat_mean_cmorph.nc
+
+### Latitude wise zonal mean hourly --------------------------------------------------
+#!/bin/bash
+
+# Define input and output directories
+input_dir=~/shared/data_projects/diurnal_precip/input_data
+output_dir=~/shared/data_projects/diurnal_precip/processed
+
+# Loop through the input files
+for input_file in "$input_dir"/*.nc; do
+    # Extract the file name without extension
+    file_name=$(basename "$input_file" .nc)
+    
+    # Extract the relevant parts of the file name
+    IFS="_" read -ra name_parts <<< "$file_name"
+    output_file="lat_mean_hourly_${name_parts[0]}.nc"
+    
+    
+    # Run the cdo command
+    cdo -b 32 -P 50 -dhourmean -zonmean "$input_file" "${output_dir}/$output_file"
+done
+
 ##################################################################
 
 ### diurnal mean--------------------------------------------------
@@ -108,3 +132,17 @@ cdo -P 43 -div -dhoursum -mul imerg_tp_mm_60ns_2001_20_025_hourly.nc -expr,'coun
 
 scp -r /home/rstudio/shared/data_projects/diurnal_precip/input_data/imerg_tp_mm_60ns_2001_20_025_hourly.nc rajani_hpc_462@storage-brno2.metacentrum.cz:~/project/data/raw/
 scp -r /home/rstudio/shared/data_projects/diurnal_precip/input_data/gsmap_tp_mm_60ns_2001_20_025_hourly.nc rajani_hpc_462@storage-brno2.metacentrum.cz:~/project/data/raw/
+
+scp -r ~/shared/data_downloads/GSMAP rajani_hpc_462@storage-brno2.metacentrum.cz:~/project/data/raw/
+scp -r ~/shared/data_downloads/IMERGHH_F_merged/ rajani_hpc_462@storage-brno2.metacentrum.cz:~/project/data/raw/IMERGHH_F_merged/
+rsync -avh --ignore-existing ~/shared/data_downloads/IMERGHH_F_merged/ rajani_hpc_462@storage-brno2.metacentrum.cz:~/project/data/raw/IMERGHH_F_merged/
+#also check if files complete or not
+rsync -avh --ignore-existing --checksum ~/shared/data_downloads/IMERGHH_F_merged/ rajani_hpc_462@storage-brno2.metacentrum.cz:~/project/data/raw/IMERGHH_F_merged/
+
+Metacentrum@462
+#save on plzen1 (imerg hourly global 20 years)
+
+scp -r /home/rstudio/shared/data_downloads/IMERG_F_hourly/imerg_f_hour_2001_2020.nc rajani_hpc_462@storage-plzen1.metacentrum.cz:
+
+Metacentrum@462
+scp -r ~/shared/data_downloads/IMERGHH_F_merged/imerg_f_hh_200106.nc rajani_hpc_462@storage-vestec1-elixir.metacentrum.cz:~
