@@ -72,7 +72,12 @@ process_dataset <- function(file_path) {
   
   dataset <- brick(file_path)
   
-  if (dataset_name == "persiann") {
+  if (dataset_name == "imerg") {
+    transposed_flipped <- flip(t(dataset), direction = "x")
+    file_datetime <- as.POSIXct(getZ(dataset), origin = "1970-01-01", format = "%Y-%m-%d %H:%M:%S")
+    dataset <- setZ(transposed_flipped, file_datetime, 'date')
+    names(dataset) <- file_datetime
+  } else if (dataset_name == "persiann") {
     pers_time <- getZ(dataset)
     posixct_time <- as.POSIXct(pers_time * 3600, origin = "2001-01-01 00:00:00")
     names(dataset) <- posixct_time
@@ -266,7 +271,7 @@ saveRDS(dat_lst_list, "./projects/main/data/hourly_mean_thres_0.5_all_datasets_L
 
 
 ################################################################################
-
+#extras----------
 
 persi_jja <- results$persiann[season == "jja"]
 summary(persi_jja)

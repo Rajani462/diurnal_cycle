@@ -32,7 +32,7 @@ for (dataset in datasets) {
 print(file_paths)
 
 # Set the number of cores to use for parallel processing
-num_cores <- detectCores() - 54
+num_cores <- detectCores() - 53
 
 # Register the parallel backend using doParallel
 cl <- makeCluster(num_cores)
@@ -54,16 +54,27 @@ process_dataset <- function(file_path) {
   
   dataset <- brick(file_path)
   
-  if (grepl("persiann_(0\\.2|0\\.5)", dataset_name)) {
+  if (grepl("imerg_(0\\.2|0\\.5)", dataset_name)) {
+    transposed_flipped <- flip(t(dataset), direction = "x")
+    file_datetime <- as.POSIXct(getZ(dataset), origin = "1970-01-01", format = "%Y-%m-%d %H:%M:%S")
+    dataset <- setZ(transposed_flipped, file_datetime, 'date')
+    names(dataset) <- file_datetime
+    # } else if (dataset_name == "gsmap") {
+    #   transposed_flipped <- flip(t(dataset), direction = "x")
+    #   file_datetime <- as.POSIXct(getZ(dataset), origin = "1970-01-01", format = "%Y-%m-%d %H:%M:%S")
+    #   dataset <- setZ(transposed_flipped, file_datetime, 'date')
+    #   names(dataset) <- file_datetime
+  } else if (grepl("persiann_(0\\.2|0\\.5)", dataset_name)) {
     pers_time <- getZ(dataset)
     posixct_time <- as.POSIXct(pers_time * 3600, origin = "2001-01-01 00:00:00")
     names(dataset) <- posixct_time
   }
   
   # Determine the column name based on the dataset name
-  col_name <- ifelse(grepl("_0\\.2$", dataset_name), "prec_int_0.2", "prec_int_0.5")
+  col_name <- ifelse(grepl("_0\\.2$", dataset_name), "prec_int_0.2", 
+                     ifelse(grepl("_0\\.5$", dataset_name), "prec_int_0.5", NA))
   
-  dataset_dt <- as.data.frame(dataset, xy = TRUE, na.rm = TRUE) %>%
+  dataset_dt <- as.data.frame(dataset, xy = TRUE, na.rm = FALSE) %>%
     as.data.table() %>%
     data.table::melt(., id.vars = c("x", "y"), variable.name = "date", value.name = col_name) %>%
     `[`(, name := factor(gsub("_0\\.2|_0\\.5", "", dataset_name)))
@@ -134,3 +145,13 @@ dat_lst_list <- lapply(merged_list, function(dt) {
 
 saveRDS(dat_lst_list, "./projects/main/data/hourly_int_thres_0.2_0.5_all_datasets_LST_glob_2001_20.rds")
 
+##########
+
+## merge 0.1 mm/hrwith 0.2 mm/hr and 0.5 mm/hr intensity thresholds
+data_list <- readRDS("./projects/main/data/hourly_int_all_datasets_LST_glob_2001_20.rds")
+
+merged_list <- lapply(data_list, function(dataset) merge(dataset, rbindlist(dat_lst_list),
+                                                         by = c("lat", "lon", "time_utc", "name",
+                                                                "location", "tmz_offset", "time_lst")))
+
+saveRDS(merged_list, "./projects/main/data/hourly_int_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
