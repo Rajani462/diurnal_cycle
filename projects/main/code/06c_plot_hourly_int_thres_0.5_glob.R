@@ -119,7 +119,7 @@ ggplot() +
   facet_grid(threshold~name) + 
   scale_fill_binned(type = "viridis", option = "B", direction = -1,
                     breaks = c(0.3, 0.6, 0.9, 1.2, 1.5, 2, 2.5, 3, 4, 5, 7, 10), show.limits = TRUE) + 
-  labs(x = NULL, y = NULL, fill = "Mean (mm/hr)") + 
+  labs(x = NULL, y = NULL, fill = "Intensity (mm/hr))") + 
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "transparent", size = 0.25) +
   theme_small +
