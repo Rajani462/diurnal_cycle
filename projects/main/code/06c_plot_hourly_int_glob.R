@@ -32,7 +32,7 @@ levels(data_dt$location) <- c("Land", "Ocean")
 ## Pre-process ----------------------------------------------
 
 ### spatial mean plot --------------------------------------
-mean_data_list <- lapply(data_list, function(df) df[, .(mean_value = round(mean(prec_int, na.rm = TRUE), 2)), by = .(lat, lon, name)])
+mean_data_list <- lapply(data_list, function(df) df[lat >= -58.875 & lat <= 58.875, .(mean_value = round(mean(prec_int, na.rm = TRUE), 2)), by = .(lat, lon, name)])
 
 extracted_data_list <- lapply(mean_data_list, function(df) df[, c("lon", "lat", "mean_value")])
 
@@ -58,6 +58,9 @@ summary(to_plot)
 to_plot[name == "PERSIANN" & value > 100]
 to_plot[value > 20]
 to_plot[value > 15]
+to_plot[value > 11]
+to_plot[value > 7]
+
 ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "white", size = 0.25) +
@@ -66,10 +69,10 @@ ggplot() +
   # geom_text(data = lbl.Y.prj[c(FALSE, FALSE, FALSE, TRUE), ], aes(x = X.prj, y = Y.prj, label = lbl), color = "black", size = 2.2, hjust = 1.5) +
   # geom_text(data = lbl.X.prj[c(FALSE, FALSE, FALSE, TRUE), ], aes(x = X.prj, y = Y.prj, label = lbl), color = "black", size = 2.2) +
   coord_fixed(ratio = 1) +
-  geom_tile(data = to_plot, aes(x = x, y = y, fill = value), alpha = 1) + 
+  geom_tile(data = to_plot[value < 11], aes(x = x, y = y, fill = value), alpha = 1) + 
   facet_wrap(~name, ncol = 3) + 
   scale_fill_binned(type = "viridis", option = "B", direction = -1,
-                    breaks = c(0.3, 0.6, 0.9, 1.2, 1.5, 2, 2.5, 3, 4, 5, 7, 10), show.limits = TRUE) + 
+                    breaks = c(0.3, 0.6, 0.9, 1.2, 1.5, 2, 2.5, 3, 4, 5, 7), show.limits = TRUE) + 
   labs(x = NULL, y = NULL, fill = "Intensity (mm/hr)") + 
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "transparent", size = 0.25) +

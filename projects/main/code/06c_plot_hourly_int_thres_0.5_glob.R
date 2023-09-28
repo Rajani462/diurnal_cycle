@@ -20,19 +20,6 @@ source('./source/graphics.R')
 
 ## read the data sets -------------------------------
 
-#dat_thres_list <- readRDS("./projects/kenya_example/data/output/diurnal_int_int_thres_list.RDS")
-# data_list <- readRDS("./projects/main/data/hourly_int_all_datasets_LST_glob_2001_20.rds")
-# data_list1 <- readRDS("./projects/main/data/hourly_int_thres_0.2_0.5_all_datasets_LST_glob_2001_20.rds")
-# 
-# 
-# merged_list <- lapply(data_list, function(dataset) merge(dataset, rbindlist(data_list1),
-#                                                          by = c("lat", "lon", "time_utc", "name",
-#                                                                 "location", "tmz_offset", "time_lst")))
-# 
-# saveRDS(merged_list, "./projects/main/data/hourly_int_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
-# # 
-# # #restart and read the dataset again to save memory
-# 
 data_list <-  readRDS("./projects/main/data/hourly_int_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
 
 
@@ -43,6 +30,14 @@ data_list <-  readRDS("./projects/main/data/hourly_int_thres_0.1_0.5_all_dataset
 mean_data_list <- lapply(data_list, function(df) df[, .('0.1' = round(mean(prec_int, na.rm = TRUE), 2), 
                                                         '0.2' = round(mean(prec_int_0.2, na.rm = TRUE), 2),
                                                         '0.5' = round(mean(prec_int_0.5, na.rm = TRUE), 2)), by = .(lat, lon, name)])
+
+lapply(mean_data_list, summary)
+
+mean_data_list <- lapply(data_list, function(df) df[lat >= -58.875 & lat <= 58.875, .('0.1' = round(mean(prec_int, na.rm = TRUE), 2), 
+                                                        '0.2' = round(mean(prec_int_0.2, na.rm = TRUE), 2),
+                                                        '0.5' = round(mean(prec_int_0.5, na.rm = TRUE), 2)), by = .(lat, lon, name)])
+
+lapply(mean_data_list, summary)
 
 extracted_data_list <- lapply(mean_data_list, function(df) df[, c("lon", "lat", "0.1", "0.2", "0.5")])
 
@@ -101,11 +96,11 @@ levels(to_plot$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
 #levels(to_plot$season) <- c("JJA", "DJF")
 levels(to_plot$threshold) <- c("0.1 (mm/hr)", "0.2 (mm/hr)", "0.5 (mm/hr)")
 
-to_plot[value < 0] #soame negative values generated in the projectraster()
-to_plot[value < 0, value := 0]
+# to_plot[value < 0] #soame negative values generated in the projectraster()
+# to_plot[value < 0, value := 0]
 
 summary(to_plot)
-to_plot[value > 100]
+to_plot[value > 25]
 
 ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
@@ -115,7 +110,7 @@ ggplot() +
   # geom_text(data = lbl.Y.prj[c(FALSE, FALSE, FALSE, TRUE), ], aes(x = X.prj, y = Y.prj, label = lbl), color = "black", size = 2.2, hjust = 1.5) +
   # geom_text(data = lbl.X.prj[c(FALSE, FALSE, FALSE, TRUE), ], aes(x = X.prj, y = Y.prj, label = lbl), color = "black", size = 2.2) +
   coord_fixed(ratio = 1) +
-  geom_tile(data = to_plot, aes(x = x, y = y, fill = value), alpha = 1) + 
+  geom_tile(data = to_plot[value < 33], aes(x = x, y = y, fill = value), alpha = 1) + 
   facet_grid(threshold~name) + 
   scale_fill_binned(type = "viridis", option = "B", direction = -1,
                     breaks = c(0.3, 0.6, 0.9, 1.2, 1.5, 2, 2.5, 3, 4, 5, 7, 10), show.limits = TRUE) + 
