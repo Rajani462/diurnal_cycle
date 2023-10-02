@@ -283,6 +283,13 @@ saveRDS(combined_dt2, "./projects/main/data/zonal_lat_mean_seasonal_0.1_0.5_2001
 
 
 #extras
+
+
+
+
+
+
+
 #for hourly mean-------------------------------------------------------------
 
 # Define the directory containing the NetCDF files
@@ -425,3 +432,32 @@ ggplot(combined_dt[lat >= 50.875], aes(hour, precip), size = 0.5) +
   geom_line() + 
   facet_wrap(~lat, scales = "free_y") + 
   theme(strip.background = element_blank(), panel.border=element_blank())
+
+################
+
+
+nc_data <- nc_open("~/shared/data_projects/diurnal_precip/processed/trail_zonmean_imerg.nc")
+
+# Read the variable data (Replace "precip" with the actual variable name)
+variable_array <- ncvar_get(nc_data, "precip")
+
+# Extract latitude values from the NetCDF file
+latitude_values <- ncvar_get(nc_data, "lat")
+
+# Extract time values from the NetCDF file
+time_values <- ncvar_get(nc_data, "time")
+
+# Calculate hourly timestamps starting from the reference time
+reference_time <- as.POSIXct("2001-01-01 00:00:00", tz = "UTC")
+timestamps <- reference_time + as.difftime(time_values, units = "hours")
+
+# Create a data.table with columns: date, precip, lat, and name
+data_dt <- data.table(
+  date = timestamps,
+  precip = as.vector(variable_array),
+  lat = latitude_values,
+  name = as.factor("imerg")  # Add the dataset name as a factor
+)
+
+
+zonal_data[name == "imerg"]
