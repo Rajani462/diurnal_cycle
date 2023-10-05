@@ -87,7 +87,25 @@ cdo -b F32 -P 40 -f nc import_binary ~/shared/data_downloads/GSMAP/v08/GSMaP_MVK
 #[6139.97s 111MB] for each year
 
 
-### Step-3: convert the resulted nc files from 0.1 to 0.25----------------------
+### Step-3: convert the resulted nc files from 0 360 to -180 to 180----------------------
+
+#!/bin/bash
+
+# Specify the range of years
+start_year=2001
+end_year=2020
+
+# Loop through the years
+for year in $(seq $start_year $end_year); do
+    input_nc_file="/home/rstudio/shared/data_downloads/GSMAP/v08/gsmap_gauge_${year}.nc"
+    output_nc_file="/home/rstudio/shared/data_downloads/GSMAP/v08/gsmap_lon_180/gsmap_gauge_${year}.nc"
+  
+    cdo -b F32 -f nc2 -P 43 -sellonlatbox,-180,180,-60,60 "$input_nc_file" "$output_nc_file"
+done
+
+
+
+### Step-4: convert the resulted nc files from 0.1 to 0.25----------------------
 
 #!/bin/bash
 
