@@ -185,7 +185,8 @@ system.time(peak_hour_list <- lapply(extracted_data_list, function(df) {
 lapply(peak_hour_list, summary)
 
 saveRDS(peak_hour_list, "./projects/main/data/int_peak_hour_dt_2001_20.RDS")
-##########
+
+#######################################
 
 peak_hour_list <- readRDS("./projects/main/data/int_peak_hour_dt_2001_20.RDS")
 
@@ -195,11 +196,6 @@ peak_hour_list <- lapply(peak_hour_list, function(df) {
 
 
 imerg <- peak_hour_list$imerg
-
-# comb <- rbind(persiann_raw, imerg)
-# comb_uniq <- unique(comb, by = c("lat", "lon"))
-# comb_uniq[name == "IMERG"]
-# comb_uniq[is.na(clusters), name := "PERSIANN"]
 
 #Filling missing pixels (lat, lon) with NA's
 peak_hour_list$gsmap <- rbind(peak_hour_list$gsmap, imerg)
@@ -237,6 +233,8 @@ levels(to_plot2$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
 
 
 library(RColorBrewer)
+my_colors <- c("red2", "sandybrown", "yellow2", "palegreen1", "lightseagreen","steelblue4", "sienna2", "red3")
+
 
 ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
@@ -247,7 +245,7 @@ ggplot() +
   geom_tile(data = to_plot2, aes(x = x, y = y, fill = peak_hour), alpha = 1) + 
   #scale_fill_manual(values = rainbow(24)) + 
   
-  scale_fill_stepsn(colours = brewer.pal(8,"Spectral"),
+  scale_fill_stepsn(colours = my_colors,
                     breaks = c(3, 6, 9, 12, 15, 18, 21), show.limits = TRUE) + 
   facet_wrap(~name, ncol = 3) + 
   labs(x = NULL, y = NULL, fill = "Peak hour (LST)") + 

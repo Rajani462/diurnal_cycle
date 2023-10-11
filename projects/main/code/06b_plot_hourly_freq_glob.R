@@ -141,7 +141,8 @@ system.time(peak_hour_list <- lapply(data_list, function(df) {
 # 412.915   4.548 342.563 
 
 saveRDS(peak_hour_list, "./projects/main/data/freq_peak_hour_dt_2001_20.RDS")
-##########
+
+################################
 
 peak_hour_list <- readRDS("./projects/main/data/freq_peak_hour_dt_2001_20.RDS")
 
@@ -173,6 +174,8 @@ blue_red_palette <- viridis_pal(direction = 1)(100)
 
 
 library(RColorBrewer)
+my_colors <- c("red2", "sandybrown", "yellow2", "palegreen1", "lightseagreen","steelblue4", "sienna2", "red3")
+
 
 ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
@@ -183,7 +186,7 @@ ggplot() +
   geom_tile(data = peak_hour_dt, aes(x = x, y = y, fill = peak_hour), alpha = 1) + 
   #scale_fill_manual(values = rainbow(24)) + 
   
-  scale_fill_stepsn(colours = brewer.pal(8,"Spectral"),
+  scale_fill_stepsn(colours = my_colors,
                     breaks = c(3, 6, 9, 12, 15, 18, 21), show.limits = TRUE) + 
   facet_wrap(~name, ncol = 3) + 
   labs(x = NULL, y = NULL, fill = "Peak hour (LST)") + 
