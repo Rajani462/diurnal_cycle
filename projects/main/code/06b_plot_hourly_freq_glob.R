@@ -185,9 +185,10 @@ ggplot() +
   coord_fixed(ratio = 1) +
   geom_tile(data = peak_hour_dt, aes(x = x, y = y, fill = peak_hour), alpha = 1) + 
   #scale_fill_manual(values = rainbow(24)) + 
-  
-  scale_fill_stepsn(colours = my_colors,
-                    breaks = c(3, 6, 9, 12, 15, 18, 21), show.limits = TRUE) + 
+  scale_fill_gradientn(colours = c("blue", "red", "yellow", "green", "blue"), 
+                       breaks = c(0, 3, 6, 9, 12, 15, 18, 21, 23)) +
+  # scale_fill_stepsn(colours = my_colors,
+  #                   breaks = c(3, 6, 9, 12, 15, 18, 21), show.limits = TRUE) + 
   facet_wrap(~name, ncol = 3) + 
   labs(x = NULL, y = NULL, fill = "Peak hour (LST)") + 
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
@@ -205,7 +206,7 @@ ggplot() +
   scale_x_discrete(breaks = NULL) + 
   scale_y_discrete(breaks = NULL) + 
  # guides(fill = guide_legend(nrow = 1, label.position = "bottom", title.position="top"))
-  guides(fill=guide_coloursteps(direction = "horizontal", title.position="top", label.position = "bottom")) 
+  guides(fill=guide_colourbar(direction = "horizontal", title.position="top", label.position = "bottom")) 
  
 
 ggsave("./projects/main/results/06b_plot_spat_peak_hour_freq.png", width = 10.5, height = 5.1, 

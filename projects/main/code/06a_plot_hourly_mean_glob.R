@@ -170,7 +170,7 @@ levels(peak_hour_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
 
 library(RColorBrewer)
 
-my_colors <- c("red2", "sandybrown", "yellow2", "palegreen1", "lightseagreen","steelblue4", "sienna2", "red3")
+#my_colors <- c("red2", "sandybrown", "yellow2", "palegreen1", "lightseagreen","steelblue2", "sienna2", "red3")
 
 ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
@@ -179,10 +179,14 @@ ggplot() +
   geom_path(data = NE_graticules_rob, aes(long, lat, group = group), linetype = "dotted", color = "grey50", size = 0.25) +
   coord_fixed(ratio = 1) +
   geom_tile(data = peak_hour_dt, aes(x = x, y = y, fill = peak_hour), alpha = 1) + 
-  #scale_fill_manual(values = rainbow(24)) + 
+  #scale_color_manual(values = rainbow(24)) + 
+  #scale_color_manual(colours = c("red", "blue")) + 
+  scale_fill_gradientn(colours = c("blue", "red", "yellow", "green", "blue"),  breaks = c(0, 3, 6, 9, 12, 15, 18, 21, 23)) + 
   
-  scale_fill_stepsn(colours = my_colors,
-                    breaks = c(3, 6, 9, 12, 15, 18, 21), show.limits = TRUE) + 
+  # scale_fill_stepsn(colours = (pals::kovesi.cyclic_mygbm_30_95_c78_s25),
+  #                   breaks = c(3, 6, 9, 12, 15, 18, 21), show.limits = TRUE) + 
+  # scale_fill_viridis(option = "magma", direction = 1,
+  #                      breaks = c(0, 3, 6, 9, 12, 15, 18, 21, 23)) + 
   facet_wrap(~name, ncol = 3) + 
   labs(x = NULL, y = NULL, fill = "Peak hour (LST)") + 
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
@@ -200,7 +204,7 @@ ggplot() +
   scale_x_discrete(breaks = NULL) + 
   scale_y_discrete(breaks = NULL) + 
   # guides(fill = guide_legend(nrow = 1, label.position = "bottom", title.position="top"))
-  guides(fill=guide_coloursteps(direction = "horizontal", title.position="top", label.position = "bottom")) 
+  guides(fill=guide_colourbar(direction = "horizontal", title.position="top", label.position = "bottom")) 
 
 
 ggsave("./projects/main/results/06a_plot_spat_peak_hour_mean.png", width = 10.5, height = 5.1, 
@@ -208,6 +212,75 @@ ggsave("./projects/main/results/06a_plot_spat_peak_hour_mean.png", width = 10.5,
 
 
 ###############################################################
+
+# variance or range among the estimates
+
+mean_data_list
+
+
+# Create a data.table from your list of data.tables
+merged_dt <- rbindlist(mean_data_list, idcol = "dataset")
+
+# Calculate the standard deviation and range for each time, latitude, and longitude
+result_dt <- merged_dt[, .(Std_Deviation = sd(mean_value), range = diff(range(mean_value))), 
+                       by = .(lat, lon)]
+
+result_dt
+summary(result_dt)
+
+extracted_data_list <- result_dt[, c("lon", "lat", "range")]
+
+# Use lapply to create a list of rasters
+raster_list <- create_raster(extracted_data_list)
+
+PROJ <- "+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+rastlist_robin <- projectRaster(raster_list, crs = PROJ)
+
+# Convert spatial data to data frame
+rast_robin_sp <- as(rastlist_robin, "SpatialPixelsDataFrame")
+rast_robin_df <- as.data.frame(rast_robin_sp) %>% as.data.table()
+
+to_plot <- melt(rast_robin_df, c("x", "y"))
+to_plot <- to_plot[, .(x, y, value = round(value, 2))]
+
+summary(to_plot)
+
+hist(to_plot$value)
+ggplot() +
+  geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
+               colour = "black", fill = "white", size = 0.25) +
+  geom_polygon(data = NE_box_rob, aes(x = long, y = lat), colour = "black", fill = "transparent", size = 0.25) +
+  geom_path(data = NE_graticules_rob, aes(long, lat, group = group), linetype = "dotted", color = "grey50", size = 0.25) +
+  # geom_text(data = lbl.Y.prj[c(FALSE, FALSE, FALSE, TRUE), ], aes(x = X.prj, y = Y.prj, label = lbl), color = "black", size = 2.2, hjust = 1.5) +
+  # geom_text(data = lbl.X.prj[c(FALSE, FALSE, FALSE, TRUE), ], aes(x = X.prj, y = Y.prj, label = lbl), color = "black", size = 2.2) +
+  coord_fixed(ratio = 1) +
+  geom_tile(data = to_plot, aes(x = x, y = y, fill = value), alpha = 1) + 
+  #facet_wrap(~name, ncol = 3) + 
+  # scale_fill_binned(type = "viridis", option = "B", direction = -1,
+  #                   breaks = c(0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6), show.limits = TRUE) + 
+  scale_fill_viridis_c(option = "C", direction = -1,
+                       breaks = c(0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6), show.limits = TRUE) + 
+  labs(x = NULL, y = NULL, fill = "Mean (mm/hr)") + 
+  geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
+               colour = "black", fill = "transparent", size = 0.25) +
+  theme_small +
+  theme(plot.title = element_text(hjust = 0.3, size = 8, face = "bold"),
+        legend.position = "bottom",
+        legend.key.width = unit(2.8, "cm"),
+        legend.key.height = unit(0.4, "cm"), 
+        legend.spacing = unit(0.25,"cm"),
+        legend.text = element_text(size = 12), 
+        legend.title = element_text(hjust = 0.5, size = 12),
+        legend.justification = "center") +
+  theme(strip.background = element_blank(), panel.border=element_blank()) + 
+  scale_x_discrete(breaks = NULL) + 
+  scale_y_discrete(breaks = NULL) + 
+  guides(fill=guide_coloursteps(title.position="top"))
+
+ggsave("./projects/main/results/06a_range_mean.png", width = 10.5, height = 5.1, 
+       units = "in", dpi = 600)
+
+
 
 
 library(fst)
@@ -229,3 +302,8 @@ ggplot(to_plot_hourly, aes(factor(hour), mean_value, fill = name)) +
   labs(x = "", y = "Mean (mm/hr)", fill = "") + 
   facet_wrap(~location, nrow = 2) + 
   theme_small
+
+
+
+dummie <- raster::raster("~/shared/data_review/rkp_hourly_precip/gsmap_tp_mm_global60s60n_200101_202012_025_hourly.nc")
+pRecipe::plot_map(dummie)

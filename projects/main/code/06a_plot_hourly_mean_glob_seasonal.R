@@ -179,6 +179,7 @@ system.time(peak_hour_list <- lapply(data_list, function(df) {
 
 saveRDS(peak_hour_dt_list, "./projects/main/data/mean_peak_hour_dt_2001_20_seasonal.RDS")
 
+##########
 peak_hour_dt_list <- readRDS("./projects/main/data/mean_peak_hour_dt_2001_20_seasonal.RDS")
 
 peak_hour_dt <- rbindlist(peak_hour_dt_list)
@@ -251,6 +252,9 @@ system.time(peak_hour_list <- lapply(data_list, function(df) {
 
 saveRDS(peak_hour_list, "./projects/main/data/mean_peak_hour_dt_2001_20_seasonal.RDS")
 
+#read the data
+peak_hour_list <- readRDS("./projects/main/data/mean_peak_hour_dt_2001_20_seasonal.RDS")
+
 extracted_data_list <- lapply(peak_hour_list, function(df) {
   df[, c("lon", "lat", "time_lst")][, time_lst := (hour(time_lst))]
 })
@@ -299,8 +303,10 @@ ggplot() +
   geom_tile(data = to_plot, aes(x = x, y = y, fill = value), alpha = 1) + 
   #scale_fill_manual(values = rainbow(24)) + 
   
-  scale_fill_stepsn(colours = brewer.pal(8,"Spectral"),
-                    breaks = c(3, 6, 9, 12, 15, 18, 21), show.limits = TRUE) + 
+  # scale_fill_stepsn(colours = brewer.pal(8,"Spectral"),
+  #                   breaks = c(3, 6, 9, 12, 15, 18, 21), show.limits = TRUE) + 
+  scale_fill_gradientn(colours = c("blue", "red", "yellow", "green", "blue"), 
+                       breaks = c(0, 3, 6, 9, 12, 15, 18, 21, 23)) + 
   facet_wrap(~name, ncol = 3) + 
   labs(x = NULL, y = NULL, fill = "Peak hour (LST)") + 
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
@@ -319,7 +325,7 @@ ggplot() +
   scale_x_discrete(breaks = NULL) + 
   scale_y_discrete(breaks = NULL) + 
   # guides(fill = guide_legend(nrow = 1, label.position = "bottom", title.position="top"))
-  guides(fill=guide_coloursteps(direction = "horizontal", title.position="top", label.position = "bottom")) 
+  guides(fill=guide_colourbar(direction = "horizontal", title.position="top", label.position = "bottom")) 
 
 
 ggsave("./projects/main/results/06a_plot_spat_peak_hour_mean_seasonal_robin.png", width = 11.5, height = 5.3, 
