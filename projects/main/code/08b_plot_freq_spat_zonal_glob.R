@@ -1,4 +1,5 @@
 library(gridExtra)
+library(ggpubr)
 library(raster)
 library(data.table)
 library(ggplot2)
@@ -125,7 +126,8 @@ zon_freq <- ggplot(to_plot[threshold == "0.1 (mm/hr)"], aes(lat, value, col = na
 
 
 
-p <- grid.arrange(freq_plot, zon_freq, nrow = 1, widths = c(2.6, 1))
+p <- ggarrange(freq_plot, zon_freq, nrow = 1, widths = c(2.6, 1), align = c("h"),
+                  labels = c("a)", "b)"), font.label=list(family = font, face = "plain", color = "#222222", size=12))
 
 ggsave("./projects/main/results/08b_freq.png", p, width = 10.5, height = 5.1, 
        units = "in", dpi = 600)

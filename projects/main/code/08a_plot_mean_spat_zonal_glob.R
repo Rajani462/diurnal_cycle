@@ -1,4 +1,5 @@
 library(gridExtra)
+library(ggpubr)
 library(raster)
 library(data.table)
 library(ggplot2)
@@ -112,7 +113,8 @@ zon_mean <- ggplot(to_plot[threshold == "no threshold"], aes(lat, value, col = n
   theme(legend.position = c(0.7, 0.2))
 
 
-p <- grid.arrange(mean_plot, zon_mean, nrow = 1, widths = c(2.8, 1))
+p <- ggarrange(mean_plot, zon_mean, nrow = 1, widths = c(2.8, 1), align = c("h"),
+               labels = c("a)", "b)"), font.label=list(family = font, face = "plain", color = "#222222", size=12))
 
 
 ggsave("./projects/main/results/08a_mean.png", p, width = 10.5, height = 5.1, 
