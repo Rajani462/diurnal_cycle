@@ -62,7 +62,7 @@ mean_plot <- ggplot() +
   facet_wrap(~name, ncol = 3) + 
   scale_fill_binned(type = "viridis", option = "B", direction = -1,
                     breaks = c(0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6), show.limits = TRUE) + 
-  labs(x = NULL, y = NULL, fill = "Mean (mm/hr)") + 
+  labs(x = NULL, y = NULL, fill = "Amount (mm/hr)") + 
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "transparent", size = 0.25) +
   theme_small +
@@ -103,14 +103,21 @@ summary(to_plot)
 zon_mean <- ggplot(to_plot[threshold == "no threshold"], aes(lat, value, col = name), size = 0.5) + 
   geom_line() + 
   scale_color_manual(values = line_colors) + 
-  labs(x = "Latitude", y = "Mean (mm/hr)", col = " ") + 
+  labs(x = "Latitude", y = "Amount (mm/hr)", col = " ") + 
   theme_small + 
   #facet_wrap(~threshold) + 
   coord_flip() + 
   scale_x_reverse(breaks = seq(-60, 60, by = 10), expand = c(0, 0)) + 
-  theme(strip.background = element_rect(fill = "white"),
+  theme(strip.background = element_rect(fill = "white"), 
+        axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10), 
+        axis.text.y = element_text(size = 10),
+        axis.title.y = element_text(size = 12), 
+        legend.text = element_text(size = 10),
         strip.text = element_text(colour = 'Black'), legend.position = "right", legend.direction = "vertical") + 
-  theme(legend.position = c(0.7, 0.2))
+  theme(legend.position = c(0.7, 0.2), legend.margin = margin(0, 0, 0, 0),
+        legend.spacing.x = unit(0, "mm"),
+        legend.spacing.y = unit(0, "mm"))
 
 
 p <- ggarrange(mean_plot, zon_mean, nrow = 1, widths = c(2.8, 1), align = c("h"),

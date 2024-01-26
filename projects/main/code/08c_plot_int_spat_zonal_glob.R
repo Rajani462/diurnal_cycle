@@ -130,9 +130,16 @@ zon_int <- ggplot(to_plot[threshold == "0.1 (mm/hr)" & lat >= -58.875 & lat <= 5
   #facet_wrap(~threshold) + 
   coord_flip() + 
   scale_x_reverse(breaks = seq(-60, 60, by = 10), expand = c(0, 0)) +
-  theme(strip.background = element_rect(fill = "white"),
+  theme(strip.background = element_rect(fill = "white"), 
+        axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10), 
+        axis.text.y = element_text(size = 10),
+        axis.title.y = element_text(size = 12), 
+        legend.text = element_text(size = 10), 
         strip.text = element_text(colour = 'Black'), legend.position = "right", legend.direction = "vertical") + 
-  theme(legend.position = c(0.8, 0.19))
+  theme(legend.position = c(0.8, 0.19), legend.margin = margin(0, 0, 0, 0),
+        legend.spacing.x = unit(0, "mm"),
+        legend.spacing.y = unit(0, "mm"))
 
 
 p <- ggarrange(int_plot, zon_int, nrow = 1, widths = c(2.2, 1), align = c("h"),

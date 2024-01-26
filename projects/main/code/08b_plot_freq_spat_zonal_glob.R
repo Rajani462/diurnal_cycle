@@ -120,9 +120,17 @@ zon_freq <- ggplot(to_plot[threshold == "0.1 (mm/hr)"], aes(lat, value, col = na
   coord_flip() + 
   scale_x_reverse() + 
   scale_x_reverse(breaks = seq(-60, 60, by = 10), expand = c(0, 0)) +  
-  theme(strip.background = element_rect(fill = "white"),
+  theme(strip.background = element_rect(fill = "white"), 
+        axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10), 
+        axis.text.y = element_text(size = 10),
+        axis.title.y = element_text(size = 12), 
+        legend.text = element_text(size = 10),
         strip.text = element_text(colour = 'Black'), legend.position = "right", legend.direction = "vertical") + 
-  theme(legend.position = c(0.75, 0.2))
+  theme(legend.position = c(0.75, 0.2), 
+        legend.margin = margin(0, 0, 0, 0),
+        legend.spacing.x = unit(0, "mm"),
+        legend.spacing.y = unit(0, "mm"))
 
 
 
