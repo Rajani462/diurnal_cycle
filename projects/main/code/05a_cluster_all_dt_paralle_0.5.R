@@ -75,6 +75,29 @@ saveRDS(processed_data_list, "./projects/main/data/cluster_4_all_dat_parellel_se
 
 #######################################
 
+#try with only land data
+dat_list <- readRDS("./projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20.rds")
+
+#dat_land_list <-  lapply(dat_list, function(x) x[location == "land"]) 
+dat_ocn_list <-  lapply(dat_list, function(x) x[location == "ocean"]) 
+
+# Process all datasets in parallel
+processed_data_list <- process_datasets_parallel(dat_ocn_list)
+
+#save the results as a list in .RDS format
+
+saveRDS(processed_data_list, "./projects/main/data/cluster_land_4_all_dat_parellel_setseed123.RDS")
+saveRDS(processed_data_list, "./projects/main/data/cluster_ocn_4_all_dat_parellel_setseed123.RDS")
+
+
+
+
+
+
+################
+
+
+
 
 mean_dat <- dat_list$cmorph[, .(lat, lon, hour = factor(hour(time_lst)), value = prec_mean)]
 mean_dat[, normalized_value := scale(value, center = TRUE, scale = TRUE), by = .(lat, lon)]

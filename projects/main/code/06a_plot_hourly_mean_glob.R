@@ -61,7 +61,7 @@ ggplot() +
   facet_wrap(~name, ncol = 3) + 
   scale_fill_binned(type = "viridis", option = "B", direction = -1,
                     breaks = c(0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6), show.limits = TRUE) + 
-  labs(x = NULL, y = NULL, fill = "Mean (mm/hr)") + 
+  labs(x = NULL, y = NULL, fill = "Amount (mm/hr)") + 
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "transparent", size = 0.25) +
   theme_small +

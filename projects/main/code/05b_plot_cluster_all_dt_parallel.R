@@ -11,6 +11,7 @@ library(dplyr)
 library(sf)
 library(hms)
 library(forcats)
+library(gridExtra)
 #library(ggh4x)
 # library(cluster)
 # library(factoextra)
@@ -47,6 +48,7 @@ levels(to_plot_all$dataset_name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "E
 ggplot(to_plot_all, aes(hour, mean_value, col = clusters, group = clusters)) + 
   geom_point() + 
   geom_line(linewidth = 1.2) + 
+  scale_color_manual(values = line_colors) + 
   facet_wrap(~dataset_name, ncol = 3) + 
   labs(x ="Hour (LST)", y = "Precipitation (mm/hr)", fill = "Clusters") + 
   theme_generic + 
@@ -78,39 +80,8 @@ ggsave("./projects/main/results/cluster/05b_all_data_cluster_4_uncert_line_plot.
        units = "in", dpi = 600)
 
 
-### spatial plot-----
-
-to_plot_spat_list <- lapply(names(processed_data_list), function(name) {
-  data_dt <- processed_data_list[[name]]
-  to_plot <- data_dt[, .(mean_value = mean(value, na.rm = TRUE)), by = .(lat, lon, clusters = as.factor(clusters))]
-  to_plot$dataset_name <- factor(name)
-  return(to_plot)
-})
-
-to_plot_spat_all <- rbindlist(to_plot_spat_list)
-levels(to_plot_spat_all$dataset_name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
-
-ggplot(to_plot_spat_all) + 
-  geom_raster(aes(lon, lat, fill = clusters)) + 
-  #scale_fill_manual(values = rainbow(24)) + 
-  borders(colour = "black") + 
-  labs(x ="", y = "") + 
-  facet_wrap(~dataset_name, ncol = 3) + 
-  coord_cartesian(xlim = c(min(to_plot_spat_all$lon), max(to_plot_spat_all$lon)), 
-                  ylim = c(min(to_plot_spat_all$lat), max(to_plot_spat_all$lat))) + 
-  scale_x_continuous(expand = c(0, 0)) + 
-  scale_y_continuous(expand = c(0, 0)) + 
-  theme_generic + 
-  theme( legend.direction = "vertical", legend.position = "right") + 
-  theme(legend.position = c(0.8, 0.15))
-
-ggsave("./projects/main/results/cluster/05b_all_data_cluster_4_spat_plot.png", width = 9.9, height = 4.6, 
-       units = "in", dpi = 600)
-
-
-
 ################################################################################
-
+### name the clusters -----
 
 to_plot_list <- lapply(names(processed_data_list), function(name) {
   data_dt <- processed_data_list[[name]]
@@ -155,7 +126,7 @@ levels(dat$cluster_name)
 to_plot_all <- dat
 levels(to_plot_all$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
 
-ggplot(to_plot_all, aes(hour, mean_value, col = cluster_name, group = cluster_name)) + 
+line_plot_nmaed <- ggplot(to_plot_all, aes(hour, mean_value, col = cluster_name, group = cluster_name)) + 
   geom_point() + 
   geom_line(linewidth = 1.2) + 
   scale_color_manual(values = line_colors) + 
@@ -168,85 +139,21 @@ ggplot(to_plot_all, aes(hour, mean_value, col = cluster_name, group = cluster_na
   theme(legend.position = c(0.8, 0.2)) + 
   scale_x_discrete(labels = function(x) ifelse(as.numeric(x) %% 4 == 0, x, ""))
 
+line_plot_nmaed
+
 ggsave("./projects/main/results/cluster/05b_all_data_cluster_4_line_plot_named.png", width = 9.5, height = 5.3, 
        units = "in", dpi = 600)
 
 
 
-#spatial named---------------
+#spatial named-------------------------------------------------------------------------------
 
-to_plot_list <- lapply(names(processed_data_list), function(name) {
-  data_dt <- processed_data_list[[name]]
-  to_plot <- data_dt[, .(mean_value = mean(value, na.rm = TRUE)), by = .(lat, lon, clusters = as.factor(clusters))]
-  to_plot$dataset_name <- factor(name)
-  return(to_plot)
-})
-
-
-dat <- rbindlist(to_plot_list)
-
-setnames(dat, "dataset_name", "name")
-
-# Define the conditions and update the cluster_name column
-dat[name %in% c("gsmap", "cmorph") & clusters == 1, cluster_name := "Afternoon peak"]
-dat[name %in% c("imerg", "era5") & clusters == 3, cluster_name := "Afternoon peak"]
-dat[name == "persiann" & clusters == 4, cluster_name := "Afternoon peak"]
-
-dat[name %in% c("gsmap", "cmorph", "persiann") & clusters == 3, cluster_name := "Early-morning peak"]
-dat[name == "imerg" & clusters == 4, cluster_name := "Early-morning peak"]
-dat[name == "era5" & clusters == 2, cluster_name := "Early-morning peak"]
-dat[name == "persiann" & clusters == 1, cluster_name := "Early-morning peak"]
-
-dat[name %in% c("imerg", "gsmap", "cmorph") & clusters == 2, cluster_name := "Late-morning peak"]
-dat[name == "era5" & clusters == 4, cluster_name := "Late-morning peak"]
-
-dat[name == "imerg" & clusters == 1, cluster_name := "Mid-night peak"]
-dat[name == "cmorph" & clusters == 4, cluster_name := "Mid-night peak"]
-dat[name == "persiann" & clusters == 3, cluster_name := "Mid-night peak"]
-
-dat[name == "persiann" & clusters == 2, cluster_name := "Mid-day peak"]
-dat[name == "era5" & clusters == 1, cluster_name := "Mid-day peak"]
-dat[name == "gsmap" & clusters == 4, cluster_name := "Mid-day peak"]
-
-# Convert cluster_name to a factor
-dat[, cluster_name := factor(cluster_name)]
-
-
-levels(dat$cluster_name)
-
-to_plot_all <- dat
-levels(to_plot_all$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
-
-ggplot(to_plot_all) + 
-  geom_raster(aes(lon, lat, fill = cluster_name)) + 
-  scale_fill_manual(values = line_colors) + 
-  borders(colour = "black") + 
-  labs(x ="", y = "") + 
-  facet_wrap(~name, ncol = 3) + 
-  coord_cartesian(xlim = c(min(to_plot_all$lon), max(to_plot_all$lon)), 
-                  ylim = c(min(to_plot_all$lat), max(to_plot_all$lat))) + 
-  scale_x_continuous(expand = c(0, 0)) + 
-  scale_y_continuous(expand = c(0, 0)) + 
-  theme_generic + 
-  theme( legend.direction = "vertical", legend.position = "right") + 
-  theme(legend.position = c(0.8, 0.15))
-
-ggsave("./projects/main/results/cluster/all_data_cluster_4_spat_plot_named.png", width = 9.9, height = 4.6, 
-       units = "in", dpi = 600)
-
-
-##########################
-# spatial nmaed in robinson projection--------------------------------------------------------
+# spatial named in robinson projection--------------------------------------------------------
 
 data_list_org <- split(to_plot_all, by = 'name') 
 data_list <- lapply(data_list_org, function(df) df[, c("lon", "lat", "clusters", "name")])
 
 imerg <- data_list$IMERG
-
-# comb <- rbind(persiann_raw, imerg)
-# comb_uniq <- unique(comb, by = c("lat", "lon"))
-# comb_uniq[name == "IMERG"]
-# comb_uniq[is.na(clusters), name := "PERSIANN"]
 
 # Assuming your list is named "data_list"
 data_list$PERSIANN <- rbind(data_list$PERSIANN, imerg)
@@ -306,7 +213,7 @@ levels(to_plot2$cluster_name)
 to_plot_all <- dat
 levels(to_plot_all$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
 
-ggplot() +
+spat_plot <- ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "white", size = 0.25) +
   geom_polygon(data = NE_box_rob, aes(x = long, y = lat), colour = "black", fill = "transparent", size = 0.25) +
@@ -326,6 +233,17 @@ ggplot() +
   scale_y_discrete(breaks = NULL) + theme( legend.direction = "vertical", legend.position = "right") + 
   theme(legend.position = c(0.80, 0.20))
 
+spat_plot
 
 ggsave("./projects/main/results/cluster/05b_all_data_cluster_4_spat_plot_named_robin.png", width = 10.5, height = 5.1, 
        units = "in", dpi = 600)
+
+p <- grid.arrange(line_plot_nmaed, spat_plot, ncol = 1)
+
+p
+
+ggsave("./projects/main/results/cluster/05b_comb_all_data_cluster_4_spat_plot_named_robin.png", p, width = 10.5, height = 5.1, 
+       units = "in", dpi = 600)
+
+
+

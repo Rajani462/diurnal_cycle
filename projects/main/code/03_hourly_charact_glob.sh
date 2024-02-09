@@ -146,3 +146,10 @@ scp -r /home/rstudio/shared/data_downloads/IMERG_F_hourly/imerg_f_hour_2001_2020
 
 Metacentrum@462
 scp -r ~/shared/data_downloads/IMERGHH_F_merged/imerg_f_hh_200106.nc rajani_hpc_462@storage-vestec1-elixir.metacentrum.cz:~
+
+
+
+#################################################################################################
+# Extra trail and experiments-----------
+
+cdo -b 32 -timmean -zonmean ~/shared/data_projects/diurnal_precip/processed/hourly_mean_imerg.nc ~/shared/data_projects/diurnal_precip/processed/trail_zonmean_imerg.nc

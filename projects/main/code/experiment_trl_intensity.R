@@ -21,6 +21,13 @@ source('./source/palettes.R')
 
 ##################################
 
+#to verify the gsmap values between -30 to -60 NS 
+cdo -P 40 sellonlatbox,-180,180,-40,-60 ~/shared/data_downloads/input_data/gsmap_tp_mm_60ns_2001_15_025_hourly.nc ~/shared/data_downloads/input_data/2015_20/trl/gsmap_tp_mm_40_60ns_2015_20_025_hourly.nc
+
+--------------------------------------------------------------------------------
+
+#verifying the intensity
+
 cdo -P 40 sellonlatbox,20,40,20,40 ~/shared/data_downloads/input_data/gsmap_tp_mm_60ns_2001_15_025_hourly.nc ~/shared/data_downloads/input_data/africa_gsmap_tp_mm_60ns_2001_15_025_hourly.nc
 
 afr <- brick("~/shared/data_downloads/input_data/2015_20/trl/africa_gsmap_tp_mm_60ns_2001_15_025_hourly.nc")
