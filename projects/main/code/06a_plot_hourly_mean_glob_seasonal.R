@@ -66,7 +66,7 @@ summary(to_plot)
 hist(to_plot$value)
 to_plot[value >= 2.5]
 
-ggplot() +
+ggplot() + 
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "white", size = 0.25) +
   geom_polygon(data = NE_box_rob, aes(x = long, y = lat), colour = "black", fill = "transparent", size = 0.25) +
@@ -74,11 +74,11 @@ ggplot() +
   # geom_text(data = lbl.Y.prj[c(FALSE, FALSE, FALSE, TRUE), ], aes(x = X.prj, y = Y.prj, label = lbl), color = "black", size = 2.2, hjust = 1.5) +
   # geom_text(data = lbl.X.prj[c(FALSE, FALSE, FALSE, TRUE), ], aes(x = X.prj, y = Y.prj, label = lbl), color = "black", size = 2.2) +
   coord_fixed(ratio = 1) +
-  geom_tile(data = to_plot, aes(x = x, y = y, fill = value), alpha = 1) + 
+  geom_raster(data = to_plot, aes(x = x, y = y, fill = value), alpha = 1) + 
   facet_grid(season~name) + 
   scale_fill_binned(type = "viridis", option = "B", direction = -1,
                     breaks = c(0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6), show.limits = TRUE) + 
-  labs(x = NULL, y = NULL, fill = "Mean (mm/hr)") + 
+  labs(x = NULL, y = NULL, fill = "Amount (mm/hr)") + 
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "transparent", size = 0.25) +
   theme_small +
@@ -135,7 +135,7 @@ ggplot(mean_24h_landocn_seas, aes(hour, mean_value, col = name, group = name)) +
   geom_point(size = 0.85) + 
   geom_line() + 
   scale_color_manual(values = line_colors) + 
-  facet_grid(location~season) + 
+  facet_grid(location~season, scale = "free_y") + 
   labs(x ="Hour (LST)", y = "Mean (mm/hr)") + 
   theme_generic + 
   theme(legend.title = element_blank(), strip.background = element_rect(fill = "white"),
@@ -157,7 +157,7 @@ ggplot(land_ocn_glob_seas, aes(hour, mean_value, col = name, group = name)) +
   geom_point(size = 0.85) + 
   geom_line() + 
   scale_color_manual(values = line_colors) + 
-  facet_grid(location~season) + 
+  facet_grid(location~season, scale = "free_y") + 
   labs(x ="Hour (LST)", y = "Mean (mm/hr)") + 
   theme_generic + 
   theme(legend.title = element_blank(), legend.position = "bottom", strip.background = element_rect(fill = "white"),

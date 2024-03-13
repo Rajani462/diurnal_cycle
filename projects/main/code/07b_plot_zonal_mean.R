@@ -149,7 +149,7 @@ to_plot_seas_landocnglob[lat >= -59.125 & lat <= 59.125]
 ggplot(to_plot_seas_landocnglob[lat >= -59.125 & lat <= 59.125], aes(lat, prec_mean, col = name), size = 0.5) + 
   geom_line() + 
   scale_color_manual(values = line_colors) + 
-  labs(x = "Latitude", y = "Mean (mm/hr)", col = " ") + 
+  labs(x = "Latitude", y = "Amount (mm/hr)", col = " ") + 
   theme_generic + 
   facet_grid(location~season) + 
   theme(strip.background = element_rect(fill = "white"),
