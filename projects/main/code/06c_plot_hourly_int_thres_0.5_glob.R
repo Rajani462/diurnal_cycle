@@ -184,14 +184,14 @@ ggplot(mean_24h_glob_plot, aes(hour, value, col = name, group = name)) +
   geom_point(size = 0.85) + 
   geom_line() + 
   scale_color_manual(values = line_colors) + 
-  facet_grid(location~threshold) + 
+  facet_grid(threshold~location, scales = "free_y") + 
   labs(x ="Hour (LST)", y = "Intensity (mm/hr)") + 
   theme_generic + 
-  theme(legend.title = element_blank(), legend.position = "right", legend.direction = "vertical", strip.background = element_rect(fill = "white"),
+  theme(legend.title = element_blank(), legend.position = "bottom", legend.direction = "horizontal", strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'))
 
 ggsave("./projects/main/results/06c_24hlineplot_int_thres_0.1_0.5_landocnglob.png",
-       width = 10.1, height = 5.3, units = "in", dpi = 600)
+       width = 8.9, height = 5.6, units = "in", dpi = 600)
 
 ### Estimate the peak hour of data.tables -------------------------------------------
 

@@ -35,10 +35,10 @@ saveRDS(merged_list, "./projects/main/data/hourly_freq_thres_0.1_0.5_all_dataset
 data_list <-  readRDS("./projects/main/data/hourly_freq_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
 
 
-data_dt <- rbindlist(data_dt)
-data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
-levels(data_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
-levels(data_dt$location) <- c("Land", "Ocean")
+# data_dt <- rbindlist(data_dt)
+# data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
+# levels(data_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
+# levels(data_dt$location) <- c("Land", "Ocean")
 
 ## Pre-process ----------------------------------------------
 
@@ -152,9 +152,9 @@ mean_24h_glob <- lapply(data_list, function(df) df[, .(prec_freq_0.1 = round(mea
 
 
 
-mean_24h_glob <- data_list[, .(prec_freq_0.1 = mean(prec_mean, na.rm = TRUE), 
-                             prec_freq_0.2 = mean(prec_mean_0.2, na.rm = TRUE), 
-                             prec_freq_0.5 = mean(prec_mean_0.5, na.rm = TRUE)), by = .(hour(time_lst), name)]
+# mean_24h_glob <- data_list[, .(prec_freq_0.1 = mean(prec_mean, na.rm = TRUE), 
+#                              prec_freq_0.2 = mean(prec_mean_0.2, na.rm = TRUE), 
+#                              prec_freq_0.5 = mean(prec_mean_0.5, na.rm = TRUE)), by = .(hour(time_lst), name)]
 
 mean_24h_glob_dt <- rbindlist(mean_24h_glob)
 
@@ -197,10 +197,10 @@ ggplot(land_ocn_glob_plot, aes(hour, value, col = name, group = name)) +
   geom_point(size = 0.85) + 
   geom_line() + 
   scale_color_manual(values = line_colors) + 
-  facet_grid(location~threshold) + 
+  facet_grid(threshold~location, scales = "free_y") + 
   labs(x ="Hour (LST)", y = "Frequency (%)") + 
   theme_generic + 
-  theme(legend.title = element_blank(), legend.position = "right", legend.direction = "vertical", strip.background = element_rect(fill = "white"),
+  theme(legend.title = element_blank(), legend.position = "bottom", legend.direction = "horizontal", strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'))
 
 ggsave("./projects/main/results/06b_24hlineplot_freq_thres_0.1_0.5_landocnglob.png",

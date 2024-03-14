@@ -222,9 +222,9 @@ ggplot(to_plot, aes(hour, prec_freq, col = name, group = name)) +
   geom_point(size = 0.85) + 
   geom_line() + 
   scale_color_manual(values = line_colors) + 
-  facet_grid(season~threshold~location) + 
+  facet_grid(season~threshold~location, scales = "free_y") + 
   labs(x ="Hour (LST)", y = "Frequency (%)") + 
-  theme_small + 
+  theme_generic + 
   theme(legend.title = element_blank(), legend.position = "right", legend.direction = "vertical", strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'))
 

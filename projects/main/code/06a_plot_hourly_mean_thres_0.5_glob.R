@@ -187,8 +187,8 @@ ggplot(mean_24h_glob_plot, aes(hour, value, col = name, group = name)) +
   geom_point(size = 0.85) + 
   geom_line() + 
   scale_color_manual(values = line_colors) + 
-  facet_grid(location~threshold) + 
-  labs(x ="Hour (LST)", y = "Mean (mm/hr)") + 
+  facet_grid(threshold~location, scales = "free_y") + 
+  labs(x ="Hour (LST)", y = "Amount (mm/hr)") + 
   theme_generic + 
   theme(legend.title = element_blank(), legend.position = "bottom", strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'))
