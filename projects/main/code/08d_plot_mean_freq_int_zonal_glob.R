@@ -49,7 +49,8 @@ zon_mean <- ggplot(to_plot[threshold == "no threshold"], aes(lat, value, col = n
   theme_small + 
   #facet_wrap(~threshold) + 
   coord_flip() + 
-  scale_x_reverse(breaks = seq(-60, 60, by = 10), expand = c(0, 0)) + 
+  scale_x_continuous(breaks = seq(-60, 60, by = 10), expand = c(0, 0)) + 
+  #scale_x_reverse(breaks = seq(60, -60, by = -10), expand = c(0, 0)) + 
   theme(strip.background = element_rect(fill = "white"), 
         axis.title.x = element_text(size = 12),
         axis.text.x = element_text(size = 10), 
@@ -60,6 +61,8 @@ zon_mean <- ggplot(to_plot[threshold == "no threshold"], aes(lat, value, col = n
   theme(legend.position = c(0.7, 0.2), legend.margin = margin(0, 0, 0, 0),
         legend.spacing.x = unit(0, "mm"),
         legend.spacing.y = unit(0, "mm"))
+
+
 
 
 # p <- ggarrange(mean_plot, zon_mean, nrow = 1, widths = c(2.8, 1), align = c("h"),
@@ -108,7 +111,7 @@ zon_freq <- ggplot(to_plot[threshold == "0.1 (mm/hr)"], aes(lat, value, col = na
   #facet_wrap(~threshold) + 
   coord_flip() + 
   scale_x_reverse() + 
-  scale_x_reverse(breaks = seq(-60, 60, by = 10), expand = c(0, 0)) +  
+  scale_x_continuous(breaks = seq(-60, 60, by = 10), expand = c(0, 0)) +  
   theme(strip.background = element_rect(fill = "white"), 
         axis.title.x = element_text(size = 12),
         axis.text.x = element_text(size = 10), 
@@ -160,7 +163,7 @@ zon_int <- ggplot(to_plot[threshold == "0.1 (mm/hr)" & lat >= -58.875 & lat <= 5
   theme_small + 
   #facet_wrap(~threshold) + 
   coord_flip() + 
-  scale_x_reverse(breaks = seq(-60, 60, by = 10), expand = c(0, 0)) +
+  scale_x_continuous(breaks = seq(-60, 60, by = 10), expand = c(0, 0)) + 
   theme(strip.background = element_rect(fill = "white"), 
         axis.title.x = element_text(size = 12),
         axis.text.x = element_text(size = 10), 
