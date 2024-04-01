@@ -58,7 +58,7 @@ zon_mean <- ggplot(to_plot[threshold == "no threshold"], aes(lat, value, col = n
         axis.title.y = element_text(size = 12), 
         legend.text = element_text(size = 10),
         strip.text = element_text(colour = 'Black'), legend.position = "right", legend.direction = "vertical") + 
-  theme(legend.position = c(0.7, 0.2), legend.margin = margin(0, 0, 0, 0),
+  theme(legend.position = c(0.75, 0.2), legend.margin = margin(0, 0, 0, 0),
         legend.spacing.x = unit(0, "mm"),
         legend.spacing.y = unit(0, "mm"))
 
