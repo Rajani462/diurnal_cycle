@@ -36,8 +36,8 @@ ens_mean <- data_comb[, .(ens_mean = mean(mean_value, na.rm = TRUE)), by = .(lat
 result <- merge(data_comb, ens_mean, by = c("lat", "lon"))
 
 # Subtract mean_value from ens_mean
-result[, difference := ens_mean - mean_value]
-View(result)
+result[, difference := mean_value - ens_mean]
+result
 result[,  `:=`(mean_value = NULL, ens_mean = NULL)]
 
 long_result <- melt(result, id.vars = c("lat", "lon", "name"))
@@ -66,8 +66,8 @@ rast_robin_df <- as.data.frame(rast_robin_sp) %>% as.data.table()
 to_plot <- melt(rast_robin_df, c("x", "y"), variable.name = "name")
 to_plot <- to_plot[, .(x, y, value = round(value, 2), name)]
 
-levels(to_plot$name) <- c("Ensemble mean", "Ensemble mean - IMERG", "Ensemble mean - GSMaP", 
-                          "Ensemble mean - CMORPH", "Ensemble mean - PERSIANN", "Ensemble mean - ERA5")
+levels(to_plot$name) <- c("Ensemble mean", "IMERG - Ensemble mean", "GSMaP - Ensemble mean", 
+                          "CMORPH - Ensemble mean", "PERSIANN - Ensemble mean", "ERA5 - Ensemble mean")
 summary(to_plot)
 
 hist(to_plot$value)
@@ -101,50 +101,6 @@ ggplot() +
         axis.text.x = element_blank(),  # Remove x-axis labels
         axis.text.y = element_blank()) +  # Remove y-axis labels
   guides(fill=guide_coloursteps(title.position="top"))
-
-# #ggsave("./projects/main/results/06a_spat_mean.png", width = 10.5, height = 5.1,
-#        units = "in", dpi = 600)
-
-library(gridExtra)
-
-# Function to create individual plots for each facet
-create_plot <- function(data, name) {
-  ggplot(data) +
-    geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
-                 colour = "black", fill = "white", size = 0.25) +
-    geom_polygon(data = NE_box_rob, aes(x = long, y = lat), colour = "black", fill = "transparent", size = 0.25) +
-    geom_path(data = NE_graticules_rob, aes(long, lat, group = group), linetype = "dotted", color = "grey50", size = 0.25) +
-    coord_fixed(ratio = 1) +
-    geom_tile(data = data, aes(x = x, y = y, fill = value), alpha = 1) + 
-    scale_fill_binned(type = "viridis", option = "B", direction = -1,
-                      breaks = c(0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6), show.limits = TRUE,
-                      guide = guide_coloursteps(title.position = "top")) +
-    labs(x = NULL, y = NULL, fill = "Amount (mm/hr)") + 
-    theme_minimal() +
-    theme(plot.title = element_text(hjust = 0.3, size = 8, face = "bold"),
-          legend.position = "bottom",
-          legend.key.width = unit(2.8, "cm"),
-          legend.key.height = unit(0.4, "cm"), 
-          legend.spacing = unit(0.25,"cm"),
-          legend.text = element_text(size = 12), 
-          legend.title = element_text(hjust = 0.5, size = 12),
-          legend.justification = "center",
-          strip.background = element_blank(),
-          panel.border = element_blank(),
-          axis.text.x = element_blank(),
-          axis.text.y = element_blank()) +
-    guides(fill = guide_colorbar(barwidth = 10, barheight = 0.5))
-}
-
-# Create individual plots for each facet
-plots <- lapply(unique(to_plot$name), function(name) {
-  create_plot(data = to_plot[to_plot$name == name, ], name = name)
-})
-
-# Arrange plots in a grid
-grid.arrange(grobs = plots, ncol = 3)
-
-
 
 
 summary(to_plot[name != "Ensemble mean"])
@@ -184,7 +140,7 @@ ggplot() +
   guides(fill=guide_coloursteps(title.position="top"))
 
 
-ggsave("./projects/main/results/11_ens_mean_diff_spat_mean.png", width = 10.5, height = 5.1,
+ggsave("./projects/main/results/11a_ens_mean_diff_spat_mean.png", width = 10.5, height = 5.1,
        units = "in", dpi = 600)
 
 ggplot() +
