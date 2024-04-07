@@ -167,18 +167,18 @@ ggsave("./projects/main/results/06c_24hlineplot_int_landocnglob_2.png",
 
 ### Estimate the peak hour of data.tables -------------------------------------------
 
-extracted_data_list <- lapply(data_list, function(df) df[, c("lon", "lat", "prec_int", "time_lst", "name")])
-str(extracted_data_list)
-lapply(extracted_data_list, summary)
+# extracted_data_list <- lapply(data_list, function(df) df[, c("lon", "lat", "prec_int", "time_lst", "name")])
+# str(extracted_data_list)
+# lapply(extracted_data_list, summary)
 
+
+system.time(peak_hour_list <- lapply(data_list, function(df) {
+  df[, .SD[which.max(prec_int)], by = .(lat, lon, name)]
+  }))
 
 # system.time(peak_hour_list <- lapply(extracted_data_list, function(df) {
-#   df[, .SD[which(prec_int == max(prec_int, na.rm = FALSE))], by = .(lat, lon)]
+#   df[, .SD[which.max(prec_int)], by = .(lon, lat, name)]
 # }))
-
-system.time(peak_hour_list <- lapply(extracted_data_list, function(df) {
-  df[, .SD[which.max(prec_int)], by = .(lon, lat, name)]
-}))
 # user  system elapsed 
 # 412.915   4.548 342.563 
 
@@ -259,10 +259,13 @@ ggplot() +
         legend.spacing = unit(0.1,"cm"),
         legend.text = element_text(size = 8), 
         legend.title = element_text(hjust = 0.5, size = 8),
-        legend.justification = "center") +
-  theme(strip.background = element_blank(), panel.border=element_blank()) + 
-  scale_x_discrete(breaks = NULL) + 
-  scale_y_discrete(breaks = NULL) + 
+        legend.justification = "center", panel.grid = element_blank(),
+        strip.background = element_blank(),
+        panel.background = element_blank(),
+        panel.border=element_blank(),
+        axis.text.x = element_blank(),  # Remove x-axis labels
+        axis.text.y = element_blank(), 
+        axis.ticks = element_blank()) + 
   # guides(fill = guide_legend(nrow = 1, label.position = "bottom", title.position="top"))
   guides(fill=guide_colourbar(direction = "horizontal", title.position="top", label.position = "bottom")) 
 
