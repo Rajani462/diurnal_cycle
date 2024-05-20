@@ -163,7 +163,24 @@ ggplot(land_ocn_glob, aes(hour, mean_value, col = name, group = name)) +
         strip.text = element_text(colour = 'Black'))
 
 ggsave("./projects/main/results/06c_24hlineplot_int_landocnglob_2.png",
-       width = 7.6, height = 5.3, units = "in", dpi = 600)
+       width = 7.6, height = 5.3, units = "in", dpi = 600) 
+
+
+
+ggplot(land_ocn_glob, aes(hour, mean_value, col = name, group = name)) + 
+  geom_point(size = 0.85) + 
+  geom_line() + 
+  scale_color_manual(values = line_colors) + 
+  facet_wrap(~location) + 
+  labs(x ="Hour (LST)", y = "Intensity (mm/hr)") + 
+  theme_generic + 
+  theme(legend.title = element_blank(), legend.position = "bottom", strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black')) + 
+  scale_y_continuous(expand = expansion(add = c(0, 0)), limits = c(0, NA))
+
+ggsave("./projects/main/results/06c_24hlineplot_int_landocnglob_scale_0.png",
+       width = 9.6, height = 4.3, units = "in", dpi = 600)
+
 
 ### Estimate the peak hour of data.tables -------------------------------------------
 
@@ -243,7 +260,7 @@ ggplot() +
   geom_path(data = NE_graticules_rob, aes(long, lat, group = group), linetype = "dotted", color = "grey50", size = 0.25) +
   coord_fixed(ratio = 1) +
   geom_tile(data = to_plot2, aes(x = x, y = y, fill = peak_hour), alpha = 1) + 
-  scale_fill_manual(values = rainbow(24)) + scale_fill_gradientn(colours = c("blue", "red", "yellow", "green", "blue"),  
+  scale_fill_gradientn(colours = c("#e66101", "#ffffbf","#0571b0", "#4dac26", "#e66101"),  
   breaks = c(0, 3, 6, 9, 12, 15, 18, 21, 23)) +
   # scale_fill_stepsn(colours = my_colors,
   #                   breaks = c(3, 6, 9, 12, 15, 18, 21), show.limits = TRUE) + 
