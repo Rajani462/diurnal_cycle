@@ -65,12 +65,35 @@ stopCluster(cl)
 # Produce a scree plot
 wss_df <- data.frame(clusters = 1:n_clusters, wss = wss)
 
-scree_plot <- ggplot(wss_df, aes(x = clusters, y = wss, group = 1)) +
+ggplot(wss_df, aes(x = clusters, y = wss, group = 1)) +
   geom_point(size = 4)+
   geom_line() + 
   scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12, 14, 16, 18, 20)) + 
   scale_y_log10() + 
-  xlab('Number of clusters')
+  xlab('Number of clusters') + 
+  theme_generic
+
+
+ggplot(wss_df, aes(x = clusters, y = wss, group = 1)) +
+  geom_point(size = 4)+
+  geom_line() + 
+  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12, 14, 16, 18, 20)) + 
+  #scale_y_log10() + 
+  labs(x = 'Number of clusters', y = 'Within Sum of Squares (WSS)') + 
+  theme_generic
+
+ggsave("./projects/main/results/12_plot_wss_method_cluster.png", width = 10.5, height = 5.3, 
+       units = "in", dpi = 600)
+
+
+# Calculate the percentage change in wss
+wss_df$percentage_change <- c(NA, diff(wss_df$wss) / wss_df$wss[-nrow(wss_df)]) * 100
+
+# Print the result
+print(wss_df)
+
+
+
 scree_plot
 
 scree_plot +

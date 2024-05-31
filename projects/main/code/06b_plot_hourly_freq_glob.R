@@ -72,10 +72,13 @@ ggplot() +
         legend.spacing = unit(0.25,"cm"),
         legend.text = element_text(size = 12), 
         legend.title = element_text(hjust = 0.5, size = 12),
-        legend.justification = "center") +
-  theme(strip.background = element_blank(), panel.border=element_blank()) + 
-  scale_x_discrete(breaks = NULL) + 
-  scale_y_discrete(breaks = NULL) + 
+        legend.justification = "center", 
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        panel.border = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(), 
+        axis.ticks = element_blank(), panel.spacing = unit(0, "lines")) + 
   guides(fill=guide_coloursteps(title.position="top"))
 
 ggsave("./projects/main/results/06b_spat_freq.png", width = 10.5, height = 5.1, 
@@ -128,6 +131,21 @@ ggsave("./projects/main/results/06b_24hlineplot_freq_landocnglob.png",
        width = 9.6, height = 4.3, units = "in", dpi = 600)
 
 
+ggplot(land_ocn_glob, aes(hour, mean_value, col = name, group = name)) + 
+  geom_point(size = 0.85) + 
+  geom_line() + 
+  scale_color_manual(values = line_colors) + 
+  facet_wrap(~location) + 
+  labs(x ="Hour (LST)", y = "Frequency (%)") + 
+  theme_generic + 
+  theme(legend.title = element_blank(), legend.position = "bottom", strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black')) +
+  scale_y_continuous(expand = expansion(add = c(0, 0)), limits = c(0, NA))
+
+ggsave("./projects/main/results/06b_24hlineplot_freq_landocnglob_scale_0.png",
+       width = 9.6, height = 4.3, units = "in", dpi = 600)
+
+
 
 ### Estimate the peak hour of data.tables -------------------------------------------
 
@@ -135,7 +153,7 @@ ggsave("./projects/main/results/06b_24hlineplot_freq_landocnglob.png",
 # # user  system elapsed 
 # # 488.337   2.325 362.277 
 system.time(peak_hour_list <- lapply(data_list, function(df) {
-  df[, .SD[which.max(prec_freq, na.rm = FALSE)], by = .(lat, lon, name)]
+  df[, .SD[which.max(prec_freq)], by = .(lat, lon, name)]
 }))
 # user  system elapsed 
 # 412.915   4.548 342.563 
@@ -185,7 +203,7 @@ ggplot() +
   coord_fixed(ratio = 1) +
   geom_tile(data = peak_hour_dt, aes(x = x, y = y, fill = peak_hour), alpha = 1) + 
   #scale_fill_manual(values = rainbow(24)) + 
-  scale_fill_gradientn(colours = c("blue", "red", "yellow", "green", "blue"), 
+  scale_fill_gradientn(colours = c("#e66101", "#ffffbf","#0571b0", "#4dac26", "#e66101"), 
                        breaks = c(0, 3, 6, 9, 12, 15, 18, 21, 23)) +
   # scale_fill_stepsn(colours = my_colors,
   #                   breaks = c(3, 6, 9, 12, 15, 18, 21), show.limits = TRUE) + 
@@ -194,20 +212,22 @@ ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "transparent", size = 0.25) +
   theme_small +
-  theme(plot.title = element_text(hjust = 0.3, size = 8, face = "bold"),
+  theme(plot.title = element_text(hjust = 0.3, size = 10, face = "bold"),
         legend.position = "bottom", legend.direction = "horizontal",
         legend.key.width = unit(1.9, "cm"),
         legend.key.height = unit(0.5, "cm"), 
         legend.spacing = unit(0.1,"cm"),
-        legend.text = element_text(size = 8), 
-        legend.title = element_text(hjust = 0.5, size = 8),
-        legend.justification = "center") +
-  theme(strip.background = element_blank(), panel.border=element_blank()) + 
-  scale_x_discrete(breaks = NULL) + 
-  scale_y_discrete(breaks = NULL) + 
- # guides(fill = guide_legend(nrow = 1, label.position = "bottom", title.position="top"))
+        legend.text = element_text(size = 10), 
+        legend.title = element_text(hjust = 0.5, size = 10),
+        legend.justification = "center", 
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        panel.background = element_blank(),
+        panel.border=element_blank(),
+        axis.text.x = element_blank(),  # Remove x-axis labels
+        axis.text.y = element_blank(), 
+        axis.ticks = element_blank(), panel.spacing = unit(0, "lines")) +  # Remove y-axis labels
   guides(fill=guide_colourbar(direction = "horizontal", title.position="top", label.position = "bottom")) 
- 
 
 ggsave("./projects/main/results/06b_plot_spat_peak_hour_freq.png", width = 10.5, height = 5.1, 
        units = "in", dpi = 600)

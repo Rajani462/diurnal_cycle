@@ -84,10 +84,13 @@ ggplot() +
         legend.spacing = unit(0.35,"cm"),
         legend.text = element_text(size = 12), 
         legend.title = element_text(hjust = 0.5, size = 12),
-        legend.justification = "center") +
-  theme(strip.background = element_blank(), panel.border=element_blank()) + 
-  scale_x_discrete(breaks = NULL) + 
-  scale_y_discrete(breaks = NULL) + 
+        legend.justification = "center", 
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        panel.border = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(), 
+        axis.ticks = element_blank(), panel.spacing = unit(0, "lines")) + 
   guides(fill=guide_coloursteps(title.position="top"))
 
 ggsave("./projects/main/results/06c_spat_int.png", width = 10.5, height = 5.1, 
@@ -163,7 +166,24 @@ ggplot(land_ocn_glob, aes(hour, mean_value, col = name, group = name)) +
         strip.text = element_text(colour = 'Black'))
 
 ggsave("./projects/main/results/06c_24hlineplot_int_landocnglob_2.png",
-       width = 7.6, height = 5.3, units = "in", dpi = 600)
+       width = 7.6, height = 5.3, units = "in", dpi = 600) 
+
+
+
+ggplot(land_ocn_glob, aes(hour, mean_value, col = name, group = name)) + 
+  geom_point(size = 0.85) + 
+  geom_line() + 
+  scale_color_manual(values = line_colors) + 
+  facet_wrap(~location) + 
+  labs(x ="Hour (LST)", y = "Intensity (mm/hr)") + 
+  theme_generic + 
+  theme(legend.title = element_blank(), legend.position = "bottom", strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black')) + 
+  scale_y_continuous(expand = expansion(add = c(0, 0)), limits = c(0, NA))
+
+ggsave("./projects/main/results/06c_24hlineplot_int_landocnglob_scale_0.png",
+       width = 9.6, height = 4.3, units = "in", dpi = 600)
+
 
 ### Estimate the peak hour of data.tables -------------------------------------------
 
@@ -243,7 +263,7 @@ ggplot() +
   geom_path(data = NE_graticules_rob, aes(long, lat, group = group), linetype = "dotted", color = "grey50", size = 0.25) +
   coord_fixed(ratio = 1) +
   geom_tile(data = to_plot2, aes(x = x, y = y, fill = peak_hour), alpha = 1) + 
-  scale_fill_manual(values = rainbow(24)) + scale_fill_gradientn(colours = c("blue", "red", "yellow", "green", "blue"),  
+  scale_fill_gradientn(colours = c("#e66101", "#ffffbf","#0571b0", "#4dac26", "#e66101"),  
   breaks = c(0, 3, 6, 9, 12, 15, 18, 21, 23)) +
   # scale_fill_stepsn(colours = my_colors,
   #                   breaks = c(3, 6, 9, 12, 15, 18, 21), show.limits = TRUE) + 
@@ -252,13 +272,13 @@ ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "transparent", size = 0.25) +
   theme_small +
-  theme(plot.title = element_text(hjust = 0.3, size = 8, face = "bold"),
+  theme(plot.title = element_text(hjust = 0.3, size = 10, face = "bold"),
         legend.position = "bottom", legend.direction = "horizontal",
         legend.key.width = unit(1.9, "cm"),
         legend.key.height = unit(0.5, "cm"), 
         legend.spacing = unit(0.1,"cm"),
-        legend.text = element_text(size = 8), 
-        legend.title = element_text(hjust = 0.5, size = 8),
+        legend.text = element_text(size = 10), 
+        legend.title = element_text(hjust = 0.5, size = 10),
         legend.justification = "center", panel.grid = element_blank(),
         strip.background = element_blank(),
         panel.background = element_blank(),

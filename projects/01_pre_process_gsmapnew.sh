@@ -129,3 +129,8 @@ cdo -b F32 -f nc2 -P 43 -dhourmean ~/shared/data_downloads/GSMAP/gsmapgauge_tp_m
 
 ###############################################################-----------------
 
+#Important note: Since we (mijael) find downloaded and pre-processed the new GSMaP data, I'm decided to
+#use this new dataset insted of the old one.
+
+cdo -b F32 -f nc2 -P 43 -selyear,2001/2020 -sellonlatbox,-180,180,-60,60 -chname,tp,precip ~/shared/data/obs/precip/raw/gsmap-v8_tp_mm_global_199801_202306_025_hourly.nc ~/shared/data_projects/diurnal_precip/input_data/gsmap_tp_mm_60ns_2001_20_025_hourly.nc
+

@@ -89,3 +89,31 @@ mean_dat_comp2_wide$clusters <- processed_data_list$cmorph$cluster #k2$cluster
 mean_dt_k_long <- melt(mean_dat_comp2_wide, c("lat", 'lon', 'clusters'), variable.name = "hour")
 
 #######################truy the plots-------
+
+to_plot_list <- lapply(names(processed_data_list), function(name) {
+  data_dt <- processed_data_list[[name]]
+  to_plot <- data_dt[, .(mean_value = mean(value, na.rm = TRUE), 
+                         q25 = quantile(value, 0.25, na.rm = TRUE), 
+                         q75 = quantile(value, 0.75, na.rm = TRUE)), by = .(hour, clusters = as.factor(clusters))]
+  to_plot$dataset_name <- factor(name)
+  return(to_plot)
+})
+
+
+to_plot_all <- rbindlist(to_plot_list)
+#to_plot_all_2 <- data.table::melt(to_plot_all, c("hour", "clusters", "dataset_name"))
+
+levels(to_plot_all$dataset_name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
+
+ggplot(to_plot_all, aes(hour, mean_value, col = clusters, group = clusters)) + 
+  geom_point() + 
+  geom_line(linewidth = 1.2) + 
+  scale_color_manual(values = line_colors) + 
+  facet_wrap(~dataset_name, ncol = 3) + 
+  labs(x ="Hour (LST)", y = "Precipitation (mm/hr)", fill = "Clusters") + 
+  theme_generic + 
+  theme(legend.title = element_blank(), strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black')) + 
+  theme(legend.direction = "vertical", legend.position = "right") + 
+  theme(legend.position = c(0.8, 0.2)) + 
+  scale_x_discrete(labels = function(x) ifelse(as.numeric(x) %% 4 == 0, x, ""))
