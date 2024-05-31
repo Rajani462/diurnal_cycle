@@ -23,6 +23,7 @@ done
 
 #for any single data
 cdo -b 32 -P 50 -timmean -zonmean ~/shared/data_projects/diurnal_precip/input_data/cmorph ~/shared/data_projects/diurnal_precip/processed/lat_mean_cmorph.nc
+cdo -b 32 -P 50 -timmean -zonmean ~/shared/data_projects/diurnal_precip/input_data/gsmap_tp_mm_60ns_2001_20_025_hourly.nc ~/shared/data_projects/diurnal_precip/processed/lat_mean_gsmap.nc
 
 ### Latitude wise zonal mean hourly --------------------------------------------------
 #!/bin/bash
@@ -69,6 +70,8 @@ for input_file in "$input_dir"/*.nc; do
 done
 
 
+#for any single file
+cdo -b 32 -P 50 -dhourmean ~/shared/data_projects/diurnal_precip/input_data/gsmap_tp_mm_60ns_2001_20_025_hourly.nc ~/shared/data_projects/diurnal_precip/processed/hourly_mean_gsmap.nc
 
 ### diurnal frequency--------------------------------------------------
 

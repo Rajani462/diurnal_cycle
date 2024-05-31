@@ -209,13 +209,22 @@ ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "transparent", size = 0.25) +
   theme_generic +
+<<<<<<< HEAD
   theme(plot.title = element_text(hjust = 0.3, size = 10, face = "bold"),
+=======
+  theme(plot.title = element_text(hjust = 0.3, size = 8, face = "bold"),
+>>>>>>> 46dff6d04cacfa664d131384b2ba6441bd1dc628
         legend.position = "bottom", legend.direction = "horizontal",
         legend.key.width = unit(1.9, "cm"),
         legend.key.height = unit(0.5, "cm"), 
         legend.spacing = unit(0.1,"cm"),
+<<<<<<< HEAD
         legend.text = element_text(size = 10), 
         legend.title = element_text(hjust = 0.5, size = 10),
+=======
+        legend.text = element_text(size = 8), 
+        legend.title = element_text(hjust = 0.5, size = 8),
+>>>>>>> 46dff6d04cacfa664d131384b2ba6441bd1dc628
         legend.justification = "center", 
         panel.grid = element_blank(),
         strip.background = element_blank(),

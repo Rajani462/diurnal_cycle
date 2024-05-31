@@ -217,8 +217,13 @@ ggplot() +
         legend.key.width = unit(1.9, "cm"),
         legend.key.height = unit(0.5, "cm"), 
         legend.spacing = unit(0.1,"cm"),
+<<<<<<< HEAD
         legend.text = element_text(size = 10), 
         legend.title = element_text(hjust = 0.5, size = 10),
+=======
+        legend.text = element_text(size = 8), 
+        legend.title = element_text(hjust = 0.5, size = 8),
+>>>>>>> 46dff6d04cacfa664d131384b2ba6441bd1dc628
         legend.justification = "center", 
         panel.grid = element_blank(),
         strip.background = element_blank(),

@@ -56,7 +56,10 @@ result[, time_diff_lst := time_lst.x - time_lst_imerg]
 summary(result)
 setnames(result, c("name.x", "location.x"), c("name", "location"))
 
+<<<<<<< HEAD
 ##########histogram---------------------
+=======
+>>>>>>> 46dff6d04cacfa664d131384b2ba6441bd1dc628
 
 to_plot <- result[, .(lat, lon, name, location, time_diff_lst)]
 
@@ -102,9 +105,12 @@ ggplot(to_plot_glob_land_ocn[name != "imerg"]) +
   theme_small
 
 
+<<<<<<< HEAD
 # spatial plot ------------------------------------------------------------
 
 
+=======
+>>>>>>> 46dff6d04cacfa664d131384b2ba6441bd1dc628
 result[time_diff_lst > 15]
 peak_hour_list <- split(result, by = "name")
 
@@ -154,9 +160,19 @@ ggplot() +
   geom_path(data = NE_graticules_rob, aes(long, lat, group = group), linetype = "dotted", color = "grey50", size = 0.25) +
   coord_fixed(ratio = 1) +
   geom_tile(data = peak_hour_dt[name != "IMERG"], aes(x = x, y = y, fill = peak_hour), alpha = 1) + 
+<<<<<<< HEAD
   scale_fill_gradientn(colors = c("#543005", "#8c510a", "#bf812d", "#FFFFFF", "#80cdc1", "#01665e", "#003c30"),
                        breaks=c(-8, -6, -4,-2, 0, 2, 4, 6, 8),
                        limits = c(-23, 23)) +
+=======
+  #scale_fill_gradientn(colours = c("blue", "red", "yellow", "green", "blue")) + 
+  #scale_fill_gradient2(low = "#2D708EFF", mid = "white", high = "#FFA07AFF", midpoint = 0) + 
+  #scale_fill_gradient2(low = "#2D708EFF", mid = "white", high = "#FFA07AFF", midpoint = 0, 
+                       #breaks = seq(-23, 23, by = 3)) + 
+  scale_fill_gradientn(colors = c("#543005", "#8c510a", "#bf812d", "#e0e0e0", "#80cdc1", "#01665e", "#003c30"),
+                       breaks=c(-12, -10, -8, -6, -4,-2, 0, 2, 4, 6, 8, 10, 12),
+                       limits = c(-23, 23)) +  
+>>>>>>> 46dff6d04cacfa664d131384b2ba6441bd1dc628
                        #n.breaks = 5,
                        #breaks = custom_breaks,
                        # guide = guide_colorbar(barwidth = 10, barheight = 0.5,
@@ -188,8 +204,11 @@ ggsave("./projects/main/results/11d_plot_spat_peak_hour_diff_mean.png", width = 
        units = "in", dpi = 600)
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 46dff6d04cacfa664d131384b2ba6441bd1dc628
 ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "white", size = 0.25) +
@@ -231,6 +250,7 @@ ggplot() +
 
 ggsave("./projects/main/results/11d_plot_spat_peak_hour_diff_mean2.png", width = 7.1, height = 5.1, 
        units = "in", dpi = 600)
+<<<<<<< HEAD
 
 ###########################################################################################################
 
@@ -280,3 +300,5 @@ ggplot() +
 
 ggsave("./projects/main/results/11d_plot_spat_peak_hour_diff_mean3.png", width = 7.1, height = 5.1, 
        units = "in", dpi = 600)
+=======
+>>>>>>> 46dff6d04cacfa664d131384b2ba6441bd1dc628
