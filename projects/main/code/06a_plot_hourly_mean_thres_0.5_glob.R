@@ -34,7 +34,8 @@ saveRDS(merged_list, "./projects/main/data/hourly_mean_thres_0.1_0.5_all_dataset
 #restart and read the dataset again to save memory
 
 data_list <-  readRDS("./projects/main/data/hourly_mean_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
-
+data_list$imerg <- NULL
+data_list$imerg <- NULL
 ## Pre-process ----------------------------------------------
 
 ### spatial mean plot --------------------------------------
@@ -129,8 +130,15 @@ ggplot() +
         legend.title = element_text(hjust = 0.5, size = 12),
         legend.justification = "center") +
   theme(strip.background = element_blank(), panel.border=element_blank()) + 
-  scale_x_discrete(breaks = NULL) + 
-  scale_y_discrete(breaks = NULL) + 
+  theme(panel.grid = element_blank(),
+        strip.background = element_blank(),
+        panel.background = element_blank(),
+        panel.border=element_blank(),
+        axis.text.x = element_blank(),  # Remove x-axis labels
+        axis.text.y = element_blank(), 
+        axis.ticks = element_blank()) + 
+  #scale_x_discrete(breaks = NULL) + 
+  #scale_y_discrete(breaks = NULL) + 
   guides(fill=guide_coloursteps(title.position="top"))
 
 

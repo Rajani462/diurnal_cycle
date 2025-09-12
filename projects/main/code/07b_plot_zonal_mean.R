@@ -23,6 +23,7 @@ source('./source/graphics.R')
 
 data_list <-  readRDS("./projects/main/data/hourly_mean_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
 
+data_list$imerg <- NULL
 
 zonmean_data_list <- lapply(data_list, function(df) df[, .('no_threshold' = mean(prec_mean, na.rm = TRUE), 
                                                            '0.1' = mean(prec_mean_0.1, na.rm = TRUE), 
@@ -48,7 +49,7 @@ ggplot(to_plot, aes(lat, value, col = name), size = 0.5) +
   theme(strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'))
 
-ggsave("./projects/main/results/07b_zonal_mean_lineplot_thres_0.1_0.5_glob.png",
+ggsave("./projects/main/results/07b_zonal_mean_lineplot_thres_0.1_0.5_glob_updated.png",
        width = 9.0, height = 5.2, units = "in", dpi = 600)
 
 ##flpped x-y axix----
@@ -66,7 +67,7 @@ ggplot(to_plot[threshold == "0.1 (mm/hr)"], aes(lat, value, col = name), size = 
   theme(legend.position = c(0.8, 0.2))
 
 
-ggsave("./projects/main/results/07b_zonal_mean_lineplot_flip.png",
+ggsave("./projects/main/results/07b_zonal_mean_lineplot_flip_updated.png",
        width = 4.5, height = 8.8, units = "in", dpi = 600)
 
 ### for land ocean and globe-------
@@ -96,13 +97,16 @@ ggplot(to_plot_landocnglob, aes(lat, value, col = name), size = 0.5) +
   theme(strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'))
 
-ggsave("./projects/main/results/07b_zonal_mean_lineplot_thres_0.1_0.5_landocnglob.png",
+ggsave("./projects/main/results/07b_zonal_mean_lineplot_thres_0.1_0.5_landocnglob_updated.png",
        width = 9.0, height = 4.8, units = "in", dpi = 600)
 
 
 ### seasonal -------------------------------
 
 data_list <- readRDS("./projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20_seasonal.rds")
+
+data_list$imerg <- NULL
+data_list$imerg <- NULL
 
 zonmean_data_list_seas <- lapply(data_list, function(df) df[, .('prec_mean' = mean(prec_mean, na.rm = TRUE)), by = .(lat, name, season)])
 
@@ -123,7 +127,7 @@ ggplot(to_plot_seas[lat >= -59.125 & lat <= 59.125], aes(lat, prec_mean, col = n
   theme(strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'))
 
-ggsave("./projects/main/results/07b_zonal_mean_lineplot_glob_seasonal.png",
+ggsave("./projects/main/results/07b_zonal_mean_lineplot_glob_seasonal_updated.png",
        width = 9.0, height = 5.2, units = "in", dpi = 600)
 
 
@@ -155,7 +159,7 @@ ggplot(to_plot_seas_landocnglob[lat >= -59.125 & lat <= 59.125], aes(lat, prec_m
   theme(strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'))
 
-ggsave("./projects/main/results/07b_zonal_mean_lineplot_globlandocn_seasonal.png",
+ggsave("./projects/main/results/07b_zonal_mean_lineplot_globlandocn_seasonal_updated.png",
        width = 9.0, height = 5.2, units = "in", dpi = 600)
 
 

@@ -10,7 +10,7 @@ library(doParallel)
 
 # Define the file paths for multiple datasets
 # Vector of dataset names and seasons
-datasets <- c("imerg", "gsmap", "cmorph", "persiann", "era5") # Add more datasets if needed
+datasets <- c("imerg", "imergv07", "gsmap", "cmorph", "persiann", "era5") # Add more datasets if needed
 thresholds <- c("0.2", "0.5")  # Add more thresholds if needed
 
 # Initialize an empty vector to store file paths

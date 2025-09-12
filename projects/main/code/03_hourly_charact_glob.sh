@@ -24,6 +24,7 @@ done
 #for any single data
 cdo -b 32 -P 50 -timmean -zonmean ~/shared/data_projects/diurnal_precip/input_data/cmorph ~/shared/data_projects/diurnal_precip/processed/lat_mean_cmorph.nc
 cdo -b 32 -P 50 -timmean -zonmean ~/shared/data_projects/diurnal_precip/input_data/gsmap_tp_mm_60ns_2001_20_025_hourly.nc ~/shared/data_projects/diurnal_precip/processed/lat_mean_gsmap.nc
+cdo -b 32 -P 50 -timmean -zonmean ~/shared/data_projects/diurnal_precip/input_data/imergv07_tp_mm_60ns_2001_20_025_hourly.nc ~/shared/data_projects/diurnal_precip/processed/lat_mean_imergv07.nc
 
 ### Latitude wise zonal mean hourly --------------------------------------------------
 #!/bin/bash
@@ -46,6 +47,8 @@ for input_file in "$input_dir"/*.nc; do
     cdo -b 32 -P 50 -dhourmean -zonmean "$input_file" "${output_dir}/$output_file"
 done
 
+#for any single data
+cdo -b 32 -P 50 -dhourmean -zonmean ~/shared/data_projects/diurnal_precip/input_data/imergv07_tp_mm_60ns_2001_20_025_hourly.nc ~/shared/data_projects/diurnal_precip/processed/lat_mean_hourly_imergv07.nc
 ##################################################################
 
 ### diurnal mean--------------------------------------------------
@@ -72,6 +75,7 @@ done
 
 #for any single file
 cdo -b 32 -P 50 -dhourmean ~/shared/data_projects/diurnal_precip/input_data/gsmap_tp_mm_60ns_2001_20_025_hourly.nc ~/shared/data_projects/diurnal_precip/processed/hourly_mean_gsmap.nc
+cdo -b 32 -P 50 -dhourmean ~/shared/data_projects/diurnal_precip/input_data/imergv07_tp_mm_60ns_2001_20_025_hourly.nc ~/shared/data_projects/diurnal_precip/processed/hourly_mean_imergv07.nc
 
 ### diurnal frequency--------------------------------------------------
 
@@ -99,6 +103,11 @@ done
 cd ~/shared/data_projects/diurnal_precip/input_data
 cdo -P 40 -mulc,100 -div -dhoursum -expr,'count_value_above_0_1 = (precip >= 0.1 ? 1 : 0)' gsmap_tp_mm_60ns_2001_20_025_hourly.nc -dhoursum -expr,'valid_mask = precip >= 0' gsmap_tp_mm_60ns_2001_20_025_hourly.nc ~/shared/data_projects/diurnal_precip/processed/hourly_freq_gsmap.nc 
 #[3865.45s 618MB]
+
+cd ~/shared/data_projects/diurnal_precip/input_data
+cdo -P 40 -mulc,100 -div -dhoursum -expr,'count_value_above_0_1 = (precip >= 0.1 ? 1 : 0)' imergv07_tp_mm_60ns_2001_20_025_hourly.nc -dhoursum -expr,'valid_mask = precip >= 0' imergv07_tp_mm_60ns_2001_20_025_hourly.nc ~/shared/data_projects/diurnal_precip/processed/hourly_freq_imergv07.nc 
+#
+
 
 ### diurnal intensity----------------------------------------------------
 
@@ -128,6 +137,9 @@ cdo -P 43 -div -dhoursum -mul gsmap_tp_mm_60ns_2001_20_025_hourly.nc -expr,'coun
 #[3959.05s 696MB]
 cdo -P 43 -div -dhoursum -mul imerg_tp_mm_60ns_2001_20_025_hourly.nc -expr,'count_value_above_0_1 = (precip >= 0.1 ? 1 : 0)' imerg_tp_mm_60ns_2001_20_025_hourly.nc -dhoursum -expr,'count_value_above_0_1 = (precip >= 0.1 ? 1 : 0)' imerg_tp_mm_60ns_2001_20_025_hourly.nc ~/shared/data_projects/diurnal_precip/processed/hourly_int_imerg.nc 
 #[4535.67s 977MB]
+
+cdo -P 43 -div -dhoursum -mul imergv07_tp_mm_60ns_2001_20_025_hourly.nc -expr,'count_value_above_0_1 = (precip >= 0.1 ? 1 : 0)' imergv07_tp_mm_60ns_2001_20_025_hourly.nc -dhoursum -expr,'count_value_above_0_1 = (precip >= 0.1 ? 1 : 0)' imergv07_tp_mm_60ns_2001_20_025_hourly.nc ~/shared/data_projects/diurnal_precip/processed/hourly_int_imergv07.nc 
+
 
 ####################################################
 

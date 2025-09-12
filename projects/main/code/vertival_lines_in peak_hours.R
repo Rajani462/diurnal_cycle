@@ -174,6 +174,7 @@ ggplot(peak_hour_dt) +
 
 ggsave("./projects/main/results/xxx_extratrial_peak_hour_freq_UTC.png", width = 10.5, height = 6.9, 
        units = "in", dpi = 600)
+write.csv(peak_hour_dt, "~/rajani/diurnal_cycle/projects/main/code/peak_hor.csv")
 
 ggplot(peak_hour_dt) + 
   geom_tile(aes(lon, lat, fill = factor(hour(time_lst)))) +

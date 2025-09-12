@@ -33,7 +33,8 @@ saveRDS(merged_list, "./projects/main/data/hourly_freq_thres_0.1_0.5_all_dataset
 #restart and read the dataset again to save memory
 
 data_list <-  readRDS("./projects/main/data/hourly_freq_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
-
+data_list$imerg <-  NULL
+data_list$imerg  <-  NULL
 
 # data_dt <- rbindlist(data_dt)
 # data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
@@ -133,8 +134,13 @@ ggplot() +
         legend.title = element_text(hjust = 0.5, size = 12),
         legend.justification = "center") +
   theme(strip.background = element_blank(), panel.border=element_blank()) + 
-  scale_x_discrete(breaks = NULL) + 
-  scale_y_discrete(breaks = NULL) + 
+  theme(panel.grid = element_blank(),
+        strip.background = element_blank(),
+        panel.background = element_blank(),
+        panel.border=element_blank(),
+        axis.text.x = element_blank(),  # Remove x-axis labels
+        axis.text.y = element_blank(), 
+        axis.ticks = element_blank()) +  
   guides(fill=guide_coloursteps(title.position="top"))
 
 ggsave("./projects/main/results/06b_spat_freq_thres_0.1_0.5.png", width = 11.5, height = 5.3, 
@@ -208,6 +214,15 @@ ggsave("./projects/main/results/06b_24hlineplot_freq_thres_0.1_0.5_landocnglob.p
 
 
 ### Estimate the peak hour of data.tables -------------------------------------------
+
+data_list <-  readRDS("./projects/main/data/hourly_freq_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
+data_list$imerg <-  NULL
+data_list$imerg  <-  NULL
+
+data_dt <- rbindlist(data_list)
+data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
+levels(data_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
+levels(data_dt$location) <- c("Land", "Ocean")
 
 system.time(peak_hour_dt <- data_dt[, .SD[which.max(prec_freq_0.5)], by = .(lat, lon, name)])
 # user  system elapsed 

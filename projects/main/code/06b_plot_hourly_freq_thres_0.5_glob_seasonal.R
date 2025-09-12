@@ -21,8 +21,8 @@ source('./source/graphics.R')
 ## read the data sets -------------------------------
 
 # #dat_thres_list <- readRDS("./projects/kenya_example/data/output/diurnal_int_freq_thres_list.RDS")
-# data_list <- readRDS("./projects/main/data/hourly_freq_all_datasets_LST_glob_2001_20_seasonal.rds")
-# data_list1 <- readRDS("./projects/main/data/hourly_freq_thres_0.5_all_datasets_LST_glob_2001_20_seasonal.rds")
+data_list <- readRDS("./projects/main/data/hourly_freq_all_datasets_LST_glob_2001_20_seasonal.rds")
+data_list1 <- readRDS("./projects/main/data/hourly_freq_thres_0.5_all_datasets_LST_glob_2001_20_seasonal.rds")
 # 
 
 merged_list <- lapply(data_list, function(dataset) merge(dataset, rbindlist(data_list1), 
@@ -34,8 +34,9 @@ saveRDS(merged_list, "./projects/main/data/hourly_freq_thres_0.1_0.5_all_dataset
 #restart and read the dataset again to save memory
 
 data_list <-  readRDS("./projects/main/data/hourly_freq_thres_0.1_0.5_all_datasets_LST_glob_2001_20_seasonal.rds")
-
-desired_order <- c("imerg", "gsmap", "cmorph", "persiann", "era5")
+data_list$imerg <- NULL
+data_list$imerg <- NULL
+desired_order <- c("imergv07", "gsmap", "cmorph", "persiann", "era5")
 
 # Use reorder to reorder the list elements
 data_list <- data_list[desired_order]

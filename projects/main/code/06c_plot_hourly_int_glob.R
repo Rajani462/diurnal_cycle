@@ -21,6 +21,7 @@ source('./source/graphics.R')
 
 #dat_thres_list <- readRDS("./projects/kenya_example/data/output/diurnal_int_int_thres_list.RDS")
 data_list <- readRDS("./projects/main/data/hourly_int_all_datasets_LST_glob_2001_20.rds")
+data_list$imerg <- NULL
 
 lapply(data_list, summary)
 
@@ -211,7 +212,7 @@ saveRDS(peak_hour_list, "./projects/main/data/int_peak_hour_dt_2001_20.RDS")
 peak_hour_list <- readRDS("./projects/main/data/int_peak_hour_dt_2001_20.RDS")
 
 peak_hour_list <- lapply(peak_hour_list, function(df) {
-  df[, c("lon", "lat", "time_lst", "name")][, time_lst := (hour(time_lst))]
+  df[, c("lon", "lat", "time_utc", "time_lst", "name")][, time_lst := (hour(time_lst))]
 })
 
 
@@ -233,7 +234,20 @@ peak_hour_list$cmorph <- unique(peak_hour_list$cmorph, by = c("lat", "lon"))
 peak_hour_list$cmorph <- peak_hour_list$cmorph[name == "imerg", time_lsts := NA]
 peak_hour_list$cmorph[is.na(peak_hour_list$cmorph$time_lsts), "name"] <- "cmorph"
 
-extracted_data_list <- lapply(peak_hour_list, function(df) df[, c("lon", "lat", "time_lst")])
+
+# Function to convert UTC to local solar time and extract fractional hour
+library(lubridate)
+convert_to_lst <- function(dt) {
+  dt[, time_lst := time_utc + dhours(lon / 15)]
+  dt[, hour_lst := hour(time_lst) + minute(time_lst)/60 + second(time_lst)/3600]
+  return(dt)
+}
+
+# Apply to each list element
+extracted_data_list2 <- lapply(peak_hour_list, convert_to_lst)
+extracted_data_list <- lapply(extracted_data_list2, function(df) df[, c("lon", "lat", "hour_lst")])
+
+# extracted_data_list <- lapply(peak_hour_list, function(df) df[, c("lon", "lat", "time_lst")])
 
 # Use lapply to create a list of rasters
 raster_list <- lapply(extracted_data_list, create_raster)
@@ -290,7 +304,7 @@ ggplot() +
   guides(fill=guide_colourbar(direction = "horizontal", title.position="top", label.position = "bottom")) 
 
 
-ggsave("./projects/main/results/06c_plot_spat_peak_hour_int.png", width = 10.5, height = 5.1, 
+ggsave("./projects/main/results/06c_plot_spat_peak_hour_int_updated.png", width = 10.5, height = 5.1, 
        units = "in", dpi = 600)
 
 

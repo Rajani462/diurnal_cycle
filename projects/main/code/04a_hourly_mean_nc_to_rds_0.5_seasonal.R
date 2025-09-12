@@ -10,7 +10,7 @@ library(doParallel)
 
 # Define the file paths for multiple datasets
 # Vector of dataset names and seasons
-datasets <- c("imerg", "gsmap", "cmorph", "persiann", "era5") # Add more datasets if needed
+datasets <- c("imerg", "imergv07", "gsmap", "cmorph", "persiann", "era5") # Add more datasets if needed
 seasons <- c("jja", "djf")
 
 # Initialize an empty vector to store file paths
@@ -132,7 +132,7 @@ dat_lst_list <- lapply(merged_list, function(dt) {
   return(dt)
 })
 
-saveRDS(dat_lst_list, "./projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20_seasonal.rds")
+saveRDS(dat_lst_list, "~/rajani/diurnal_cycle/projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20_seasonal.rds")
 
 
 ################################################################################
@@ -150,7 +150,7 @@ library(doParallel)
 
 # Define the file paths for multiple datasets
 # Vector of dataset names and seasons
-datasets <- c("imerg", "gsmap", "cmorph", "persiann", "era5") # Add more datasets if needed
+datasets <- c("imerg", "imergv07", "gsmap", "cmorph", "persiann", "era5") # Add more datasets if needed
 seasons <- c("jja", "djf")
 
 # Initialize an empty vector to store file paths
@@ -267,7 +267,7 @@ dat_lst_list <- lapply(merged_list, function(dt) {
   return(dt)
 })
 
-saveRDS(dat_lst_list, "./projects/main/data/hourly_mean_thres_0.5_all_datasets_LST_glob_2001_20_seasonal.rds")
+saveRDS(dat_lst_list, "~/rajani/diurnal_cycle/projects/main/data/hourly_mean_thres_0.5_all_datasets_LST_glob_2001_20_seasonal.rds")
 
 
 ################################################################################
@@ -289,7 +289,7 @@ library(doParallel)
 
 # Define the file paths for multiple datasets
 # Vector of dataset names and seasons
-datasets <- c("imerg", "gsmap", "cmorph", "persiann", "era5") # Add more datasets if needed
+datasets <- c("imerg", "imergv07", "gsmap", "cmorph", "persiann", "era5") # Add more datasets if needed
 seasons <- c("jja", "djf")
 thresholds <- c("0.1", "0.2", "0.5")  # Add more thresholds if needed
 
@@ -429,7 +429,7 @@ summary(mask_table)
 merged_list <- lapply(results, function(dataset) merge(dataset, mask_table, by = c("lon", "lat")))
 
 
-saveRDS(merged_list, "./projects/main/data/hourly_mean_thres_0.5_all_datasets_LST_glob_2001_20_seasonal.rds") 
+saveRDS(merged_list, "~/rajani/diurnal_cycle/projects/main/data/hourly_mean_thres_0.5_all_datasets_LST_glob_2001_20_seasonal.rds") 
 
 
 ##################
@@ -447,7 +447,7 @@ dat_list <- # Add the 'threshold' column directly to each dataset in the list
 comb_list <- c(dat_list, merged_list)
 comb_list <- tapply(comb_list, names(comb_list), dplyr::bind_rows)
 
-saveRDS(comb_list, "./projects/main/data/hourly_mean_thres_0.1_0.5_all_datasets_LST_glob_2001_20_seasonal.rds")
+saveRDS(comb_list, "~/rajani/diurnal_cycle/projects/main/data/hourly_mean_thres_0.1_0.5_all_datasets_LST_glob_2001_20_seasonal.rds")
 
 
 

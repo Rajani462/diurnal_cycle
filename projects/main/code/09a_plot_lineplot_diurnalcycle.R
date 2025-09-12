@@ -26,6 +26,8 @@ data_list <- readRDS("./projects/main/data/hourly_mean_all_datasets_LST_glob_200
 
 lapply(data_list, summary)
 
+data_list$imerg <- NULL
+
 data_dt <- rbindlist(data_list)
 data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
 levels(data_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
@@ -52,7 +54,15 @@ ggplot(mean_24h_glob, aes(hour, mean_value, col = name, group = name)) +
 
 ##for land and ocean
 mean_24h_landocn <- data_dt[, .(mean_value = mean(prec_mean, na.rm = TRUE)), by = .(hour(time_lst), name, location)]
-
+summary(mean_24h_landocn[location == "Land" & name  == "IMERG"])
+lapply(
+  split(mean_24h_landocn[location == "Land"], by = "name"),
+  function(dt) {
+    lapply(dt[, sapply(dt, is.numeric), with = FALSE], function(col) {
+      round(summary(col), 2)
+    })
+  }
+)
 ggplot(mean_24h_landocn, aes(hour, mean_value, col = name, group = name)) + 
   geom_point(size = 0.85) + 
   geom_line() + 
@@ -92,6 +102,8 @@ mean <- ggplot(land_ocn_glob_mean, aes(hour, mean_value, col = name, group = nam
 data_list <- readRDS("./projects/main/data/hourly_freq_all_datasets_LST_glob_2001_20.rds")
 
 lapply(data_list, summary)
+
+data_list$imerg <- NULL
 
 data_dt <- rbindlist(data_list)
 data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
@@ -158,6 +170,8 @@ freq <- ggplot(land_ocn_glob_freq, aes(hour, mean_value, col = name, group = nam
 data_list <- readRDS("./projects/main/data/hourly_int_all_datasets_LST_glob_2001_20.rds")
 
 lapply(data_list, summary)
+
+data_list$imerg <- NULL
 
 data_dt <- rbindlist(data_list)
 data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
@@ -261,7 +275,7 @@ ggarrange(mean, freq, int, nrow = 3, common.legend = TRUE, legend="bottom", alig
           labels = "auto", hjust = -0.5, vjust = 0.5, font.label=list(family = font, face = "plain", color = "#222222", size=10))
 
 
-ggsave("./projects/main/results/09a_24hlineplot_mean_freq_int_landocnglob2.png",
+ggsave("./projects/main/results/09a_24hlineplot_mean_freq_int_landocnglob2_updated.png",
        width = 7.6, height = 5.3, units = "in", dpi = 600)
 
 
@@ -280,7 +294,7 @@ ggarrange(plot1, plot2, plot3, nrow = 3, common.legend = TRUE, legend = "bottom"
 
 
 # Save the arranged plots with increased right margin
-ggsave("./projects/main/results/09a_24hlineplot_mean_freq_int_landocnglob.png",
+ggsave("./projects/main/results/09a_24hlineplot_mean_freq_int_landocnglob_updated.png",
        width = 7.6, height = 5.3, units = "in", dpi = 600)
 
 

@@ -32,10 +32,12 @@ mean_24h_landocn <- data_dt[, .(mean_value = mean(prec_mean, na.rm = TRUE)), by 
 mean_24h_glob2 <- mean_24h_glob[, .(hour, name, location = factor("Global"), mean_value)]
 land_ocn_glob_mean <- rbind(mean_24h_glob2, mean_24h_landocn)
 
+line_colors2 <- c("#D35C37", "#BF9A77", "#ACBD78", "#4D648D", "#E69F00")
+
 mean <- ggplot(land_ocn_glob_mean, aes(hour, mean_value, col = name, group = name)) + 
   geom_point(size = 0.85) + 
   geom_line() + 
-  scale_color_manual(values = line_colors) + 
+  scale_color_manual(values = line_colors2) + 
   facet_wrap(~location) + 
   labs(x ="", y = "Amount (mm/hr)") + 
   theme_small + 
@@ -61,7 +63,7 @@ land_ocn_glob_freq <- rbind(mean_24h_glob2, mean_24h_landocn)
 freq <- ggplot(land_ocn_glob_freq, aes(hour, mean_value, col = name, group = name)) + 
   geom_point(size = 0.85) + 
   geom_line() + 
-  scale_color_manual(values = line_colors) + 
+  scale_color_manual(values = line_colors2) + 
   facet_wrap(~location) + 
   labs(x ="", y = "Frequency (%)") + 
   theme_small + 
@@ -87,7 +89,7 @@ land_ocn_glob <- rbind(mean_24h_glob2, mean_24h_landocn)
 int <- ggplot(land_ocn_glob, aes(hour, mean_value, col = name, group = name)) + 
   geom_point(size = 0.85) + 
   geom_line() + 
-  scale_color_manual(values = line_colors) + 
+  scale_color_manual(values = line_colors2) + 
   facet_wrap(~location) + 
   labs(x ="Hour (LST)", y = "Intensity (mm/hr)") + 
   theme_small + 

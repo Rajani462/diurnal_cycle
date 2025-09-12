@@ -10,7 +10,7 @@ library(doParallel)
 library(hms)
 
 # Define the file paths for multiple datasets
-datasets <- c("imerg", "gsmap", "cmorph", "persiann", "era5")
+datasets <- c("imerg", "imergv07","gsmap", "cmorph", "persiann", "era5")
 file_paths <- sprintf("~/shared/data_projects/diurnal_precip/processed/hourly_int_%s.nc", datasets)
 
 
@@ -113,20 +113,21 @@ library(doParallel)
 
 # Define the file paths for multiple datasets
 # Vector of dataset names and seasons
-datasets <- c("imerg", "gsmap", "cmorph", "persiann", "era5") # Add more datasets if needed
+datasets <- c("imerg", "imergv07", "gsmap", "cmorph", "persiann", "era5") # Add more datasets if needed
 seasons <- c("jja", "djf")
 
 # Initialize an empty vector to store file paths
 file_paths <- character(0)
 
 # Generate file paths using nested loops and paste0
-
+#Still not sure, have to recheck
 for (dataset in datasets) {
   for (season in seasons) {
     file_name <- paste0("hourly_int_", dataset, "_tp_mm_60ns_", ifelse(dataset == "gsmap", "2015_20", "2001_20"), "_025_hourly_", season)
     # if (dataset %in% c("imerg", "gsmap")) {
     #   file_name <- paste0(file_name, "_fliptrans")
     # }
+    #file_path <- paste0("~/shared/data_downloads/input_data/seasonal/hourly_character/", file_name, ".nc")
     file_path <- paste0("~/shared/data_downloads/input_data/seasonal/hourly_character/", file_name, ".nc")
     file_paths <- c(file_paths, file_path)
   }

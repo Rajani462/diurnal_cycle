@@ -38,7 +38,7 @@ mean_dat_wide_org <- dcast(mean_dat, lat + lon ~ hour)
 mean_dat_wide <- mean_dat_wide_org[, !c("lat", "lon")]
 
 #mean_dat_wide_scaled <- scale(mean_dat_wide, center = TRUE, scale = FALSE)
-
+library(factoextra)
 fviz_nbclust(mean_dat_wide, kmeans, method = "wss")
 
 

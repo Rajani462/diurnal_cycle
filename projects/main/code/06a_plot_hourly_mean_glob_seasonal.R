@@ -22,7 +22,8 @@ source('./source/graphics.R')
 ## read the data sets -------------------------------
 
 data_list <- readRDS("./projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20_seasonal.rds")
-
+data_list$imerg <- NULL
+data_list$imerg <- NULL
 
 ### spatial mean plot --------------------------------------
 
@@ -56,7 +57,7 @@ to_plot <- to_plot[, .(x, y, value, name = factor(name), season= factor(season))
 to_plot$season <- factor(to_plot$season, levels = c("1", "2"), labels = c("JJA", "DJF"))
 
 #Define the desired order of levels
-desired_order <- c("imerg", "gsmap", "cmorph", "persiann", "era5")
+desired_order <- c("imergv07", "gsmap", "cmorph", "persiann", "era5")
 
 # Reorder the levels of the "name" column
 to_plot$name <- factor(to_plot$name, levels = desired_order)
@@ -177,7 +178,7 @@ system.time(peak_hour_list <- lapply(data_list, function(df) {
   df[, .SD[which.max(prec_mean)], by = .(lat, lon, name, season)]
 }))
 
-saveRDS(peak_hour_dt_list, "./projects/main/data/mean_peak_hour_dt_2001_20_seasonal.RDS")
+saveRDS(peak_hour_list, "./projects/main/data/mean_peak_hour_dt_2001_20_seasonal.RDS")
 
 ##########
 peak_hour_dt_list <- readRDS("./projects/main/data/mean_peak_hour_dt_2001_20_seasonal.RDS")
@@ -246,14 +247,14 @@ ggsave("./projects/main/results/06a_plot_spat_peak_hour_mean_seasonal_clasfy.png
 # in Robinson projection --------------------------------------------------
 
 
-system.time(peak_hour_list <- lapply(data_list, function(df) {
-  df[, .SD[which.max(prec_mean)], by = .(lat, lon, name, season)]
-}))
-
-saveRDS(peak_hour_list, "./projects/main/data/mean_peak_hour_dt_2001_20_seasonal.RDS")
-
-#read the data
-peak_hour_list <- readRDS("./projects/main/data/mean_peak_hour_dt_2001_20_seasonal.RDS")
+# system.time(peak_hour_list <- lapply(data_list, function(df) {
+#   df[, .SD[which.max(prec_mean)], by = .(lat, lon, name, season)]
+# }))
+# 
+# saveRDS(peak_hour_list, "./projects/main/data/mean_peak_hour_dt_2001_20_seasonal.RDS")
+# 
+# #read the data
+# peak_hour_list <- readRDS("./projects/main/data/mean_peak_hour_dt_2001_20_seasonal.RDS")
 
 extracted_data_list <- lapply(peak_hour_list, function(df) {
   df[, c("lon", "lat", "time_lst")][, time_lst := (hour(time_lst))]
@@ -286,7 +287,7 @@ to_plot <- to_plot[, .(x, y, value, name = factor(name), season= factor(season))
 to_plot$season <- factor(to_plot$season, levels = c("1", "2"), labels = c("JJA", "DJF"))
 
 #Define the desired order of levels
-desired_order <- c("imerg", "gsmap", "cmorph", "persiann", "era5")
+desired_order <- c("imergv07", "gsmap", "cmorph", "persiann", "era5")
 
 # Reorder the levels of the "name" column
 to_plot$name <- factor(to_plot$name, levels = desired_order)
@@ -322,8 +323,15 @@ ggplot() +
         legend.title = element_text(hjust = 0.5, size = 8),
         legend.justification = "center") +
   theme(strip.background = element_blank(), panel.border=element_blank()) + 
-  scale_x_discrete(breaks = NULL) + 
-  scale_y_discrete(breaks = NULL) + 
+  theme(panel.grid = element_blank(),
+        strip.background = element_blank(),
+        panel.background = element_blank(),
+        panel.border=element_blank(),
+        axis.text.x = element_blank(),  # Remove x-axis labels
+        axis.text.y = element_blank(), 
+        axis.ticks = element_blank()) + 
+  #scale_x_discrete(breaks = NULL) + 
+  #scale_y_discrete(breaks = NULL) + 
   # guides(fill = guide_legend(nrow = 1, label.position = "bottom", title.position="top"))
   guides(fill=guide_colourbar(direction = "horizontal", title.position="top", label.position = "bottom")) 
 

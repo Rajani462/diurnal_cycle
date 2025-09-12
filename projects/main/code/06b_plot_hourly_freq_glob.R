@@ -21,7 +21,7 @@ source('./source/graphics.R')
 
 #dat_thres_list <- readRDS("./projects/kenya_example/data/output/diurnal_int_freq_thres_list.RDS")
 data_list <- readRDS("./projects/main/data/hourly_freq_all_datasets_LST_glob_2001_20.rds")
-
+data_list$imerg <- NULL
 
 ## Pre-process ----------------------------------------------
 
@@ -164,12 +164,24 @@ saveRDS(peak_hour_list, "./projects/main/data/freq_peak_hour_dt_2001_20.RDS")
 
 peak_hour_list <- readRDS("./projects/main/data/freq_peak_hour_dt_2001_20.RDS")
 
-extracted_data_list <- lapply(peak_hour_list, function(df) df[, c("lon", "lat", "time_lst")])
+# Function to convert UTC to local solar time and extract fractional hour
+library(lubridate)
+convert_to_lst <- function(dt) {
+  dt[, time_lst := time_utc + dhours(lon / 15)]
+  dt[, hour_lst := hour(time_lst) + minute(time_lst)/60 + second(time_lst)/3600]
+  return(dt)
+}
 
+# Apply to each list element
+extracted_data_list2 <- lapply(peak_hour_list, convert_to_lst)
+extracted_data_list <- lapply(extracted_data_list2, function(df) df[, c("lon", "lat", "hour_lst")])
 
-extracted_data_list <- lapply(peak_hour_list, function(df) {
-  df[, c("lon", "lat", "time_lst")][, time_lst := (hour(time_lst))]
-})
+# extracted_data_list <- lapply(peak_hour_list, function(df) df[, c("lon", "lat", "time_lst")])
+# 
+# 
+# extracted_data_list <- lapply(peak_hour_list, function(df) {
+#   df[, c("lon", "lat", "time_lst")][, time_lst := (hour(time_lst))]
+# })
 
 # Use lapply to create a list of rasters
 raster_list <- lapply(extracted_data_list, create_raster)
@@ -217,13 +229,10 @@ ggplot() +
         legend.key.width = unit(1.9, "cm"),
         legend.key.height = unit(0.5, "cm"), 
         legend.spacing = unit(0.1,"cm"),
-<<<<<<< HEAD
-        legend.text = element_text(size = 10), 
-        legend.title = element_text(hjust = 0.5, size = 10),
-=======
+        #legend.text = element_text(size = 10), 
+        #legend.title = element_text(hjust = 0.5, size = 10),
         legend.text = element_text(size = 8), 
         legend.title = element_text(hjust = 0.5, size = 8),
->>>>>>> 46dff6d04cacfa664d131384b2ba6441bd1dc628
         legend.justification = "center", 
         panel.grid = element_blank(),
         strip.background = element_blank(),
@@ -234,7 +243,7 @@ ggplot() +
         axis.ticks = element_blank(), panel.spacing = unit(0, "lines")) +  # Remove y-axis labels
   guides(fill=guide_colourbar(direction = "horizontal", title.position="top", label.position = "bottom")) 
 
-ggsave("./projects/main/results/06b_plot_spat_peak_hour_freq.png", width = 10.5, height = 5.1, 
+ggsave("./projects/main/results/06b_plot_spat_peak_hour_freq_updated.png", width = 10.5, height = 5.1, 
        units = "in", dpi = 600)
 
 

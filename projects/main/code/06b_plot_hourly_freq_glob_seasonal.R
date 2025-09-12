@@ -22,6 +22,8 @@ source('./source/graphics.R')
 ## read the data sets -------------------------------
 
 data_list <- readRDS("./projects/main/data/hourly_freq_all_datasets_LST_glob_2001_20_seasonal.rds")
+data_list$imerg <- NULL
+data_list$imerg <- NULL
 
 data_dt <- rbindlist(data_list)
 data_dt[, `:=`(time_utc = NULL, tmz_offset = NULL)]
@@ -62,7 +64,7 @@ to_plot <- to_plot[, .(x, y, value, name = factor(name), season= factor(season))
 to_plot$season <- factor(to_plot$season, levels = c("1", "2"), labels = c("JJA", "DJF"))
 
 #Define the desired order of levels
-desired_order <- c("imerg", "gsmap", "cmorph", "persiann", "era5")
+desired_order <- c("imergv07", "gsmap", "cmorph", "persiann", "era5")
 
 # Reorder the levels of the "name" column
 to_plot$name <- factor(to_plot$name, levels = desired_order)
@@ -95,8 +97,15 @@ ggplot() +
         legend.title = element_text(hjust = 0.5, size = 12),
         legend.justification = "center") +
   theme(strip.background = element_blank(), panel.border=element_blank()) + 
-  scale_x_discrete(breaks = NULL) + 
-  scale_y_discrete(breaks = NULL) + 
+  theme(panel.grid = element_blank(),
+        strip.background = element_blank(),
+        panel.background = element_blank(),
+        panel.border=element_blank(),
+        axis.text.x = element_blank(),  # Remove x-axis labels
+        axis.text.y = element_blank(), 
+        axis.ticks = element_blank()) + 
+  #scale_x_discrete(breaks = NULL) + 
+  #scale_y_discrete(breaks = NULL) +
   guides(fill=guide_coloursteps(title.position="top"))
 
 
@@ -335,8 +344,15 @@ ggplot() +
         legend.title = element_text(hjust = 0.5, size = 8),
         legend.justification = "center") +
   theme(strip.background = element_blank(), panel.border=element_blank()) + 
-  scale_x_discrete(breaks = NULL) + 
-  scale_y_discrete(breaks = NULL) + 
+  theme(panel.grid = element_blank(),
+        strip.background = element_blank(),
+        panel.background = element_blank(),
+        panel.border=element_blank(),
+        axis.text.x = element_blank(),  # Remove x-axis labels
+        axis.text.y = element_blank(), 
+        axis.ticks = element_blank()) + 
+  #scale_x_discrete(breaks = NULL) + 
+  #scale_y_discrete(breaks = NULL) + 
   # guides(fill = guide_legend(nrow = 1, label.position = "bottom", title.position="top"))
   guides(fill=guide_colourbar(direction = "horizontal", title.position="top", label.position = "bottom")) 
 

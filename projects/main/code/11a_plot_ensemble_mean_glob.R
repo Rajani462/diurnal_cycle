@@ -27,6 +27,7 @@ data_list <- readRDS("./projects/main/data/hourly_mean_all_datasets_LST_glob_200
 
 ## Pre-process ----------------------------------------------
 ### spatial mean plot --------------------------------------
+data_list$imerg <- NULL
 mean_data_list <- lapply(data_list, function(df) df[, .(mean_value = round(mean(prec_mean, na.rm = TRUE), 2)), by = .(lat, lon, name)])
 
 data_comb <- rbindlist(mean_data_list)
@@ -142,7 +143,7 @@ ggplot() +
   guides(fill=guide_coloursteps(title.position="top"))
 
 
-ggsave("./projects/main/results/11a_ens_mean_diff_spat_mean.png", width = 10.5, height = 5.1,
+ggsave("./projects/main/results/11a_ens_mean_diff_spat_mean_updated.png", width = 10.5, height = 5.1,
        units = "in", dpi = 600)
 
 

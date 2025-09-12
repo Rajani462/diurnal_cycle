@@ -216,7 +216,7 @@ ggplot() +
   ylim(y_min, y_max)    # Limit y-axis
 
 
-ggsave("./projects/main/results/14a_supplot_mount_asia_spat_peak_hour_mean_robinsn.png", width = 10.5, height = 5.1, 
+ggsave("./projects/main/results/14a_supplot_mount_asia_spat_peak_hour_mean_robinsn_updated.png", width = 10.5, height = 5.1, 
        units = "in", dpi = 600)
 
 
@@ -286,7 +286,7 @@ ggplot() +
   ylim(y_min, y_max)    # Limit y-axis
 
 
-ggsave("./projects/main/results/14a_supplot_greatpalin_usa_spat_peak_hour_mean_robinsn.png", width = 10.5, height = 5.1, 
+ggsave("./projects/main/results/14a_supplot_greatpalin_usa_spat_peak_hour_mean_robinsn_updated.png", width = 10.5, height = 5.1, 
        units = "in", dpi = 600)
 
 
@@ -356,7 +356,7 @@ amz_plot <- ggplot() +
   theme(legend.position = "none")
 
 
-ggsave("./projects/main/results/14a_supplot_amazon_spat_peak_hour_mean_robinsn.png", width = 10.5, height = 5.1, 
+ggsave("./projects/main/results/14a_supplot_amazon_spat_peak_hour_mean_robinsn_updated.png", width = 10.5, height = 5.1, 
        units = "in", dpi = 600)
 
 #################################################
@@ -450,7 +450,7 @@ main_plot <- ggplot() +
   guides(fill=guide_colourbar(direction = "horizontal", title.position="top", label.position = "bottom"))
 
 main_plot
-ggsave("./projects/main/results/14a_plot_orographic_precip_mean.png", width = 7.5, height = 5.1, 
+ggsave("./projects/main/results/14a_plot_orographic_precip_mean_updated.png", width = 7.5, height = 5.1, 
        units = "in", dpi = 600)
 
 

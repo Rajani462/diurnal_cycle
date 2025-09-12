@@ -9,7 +9,7 @@ library(foreach)
 library(doParallel)
 library(hms)
 
-datasets <- c("imerg", "gsmap", "cmorph", "persiann", "era5")
+datasets <- c("imerg", "imergv07", "gsmap", "cmorph", "persiann", "era5")
 file_paths <- sprintf("~/shared/data_projects/diurnal_precip/processed/hourly_freq_%s.nc", datasets)
 
 
@@ -107,7 +107,7 @@ library(doParallel)
 
 # Define the file paths for multiple datasets
 # Vector of dataset names and seasons
-datasets <- c("imerg", "gsmap", "cmorph", "persiann", "era5") # Add more datasets if needed
+datasets <- c("imerg", "imergv07", "gsmap", "cmorph", "persiann", "era5") # Add more datasets if needed
 seasons <- c("jja", "djf")
 
 # Initialize an empty vector to store file paths

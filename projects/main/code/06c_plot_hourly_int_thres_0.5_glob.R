@@ -22,6 +22,7 @@ source('./source/graphics.R')
 
 data_list <-  readRDS("./projects/main/data/hourly_int_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
 
+data_list$imerg <- NULL
 
 ### spatial mean plot --------------------------------------
 
@@ -132,7 +133,7 @@ ggplot() +
   guides(fill=guide_coloursteps(title.position="top"))
 
 
-ggsave("./projects/main/results/06c_spat_int_thres_0.1_0.5_robin.png", width = 11.5, height = 5.3, 
+ggsave("./projects/main/results/06c_spat_int_thres_0.1_0.5_robin_updated.png", width = 11.5, height = 5.3, 
        units = "in", dpi = 600)
 
 
@@ -163,7 +164,7 @@ ggplot(mean_24h_glob_plot, aes(hour, value, col = name, group = name)) +
         strip.text = element_text(colour = 'Black'))
 
 
-ggsave("./projects/main/results/06c_24hlineplot_int_thres_0.1_0.5_glob.png",
+ggsave("./projects/main/results/06c_24hlineplot_int_thres_0.1_0.5_glob_updated.png",
        width = 9.9, height = 4.6, units = "in", dpi = 600)
 
 
@@ -190,7 +191,7 @@ ggplot(mean_24h_glob_plot, aes(hour, value, col = name, group = name)) +
   theme(legend.title = element_blank(), legend.position = "bottom", legend.direction = "horizontal", strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'))
 
-ggsave("./projects/main/results/06c_24hlineplot_int_thres_0.1_0.5_landocnglob.png",
+ggsave("./projects/main/results/06c_24hlineplot_int_thres_0.1_0.5_landocnglob_updated.png",
        width = 8.9, height = 5.6, units = "in", dpi = 600)
 
 ### Estimate the peak hour of data.tables -------------------------------------------

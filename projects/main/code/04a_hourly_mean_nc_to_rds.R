@@ -10,7 +10,7 @@ library(doParallel)
 library(hms)
 
 
-datasets <- c("imerg", "gsmap", "cmorph", "persiann", "era5")
+datasets <- c("imerg", "imergv07", "gsmap", "cmorph", "persiann", "era5")
 file_paths <- sprintf("~/shared/data_projects/diurnal_precip/processed/hourly_mean_%s.nc", datasets)
 
 
@@ -101,7 +101,7 @@ dat_lst_list <- lapply(merged_output_list, function(dt) {
 })
 
 
-saveRDS(dat_lst_list, "./projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20.rds")
+saveRDS(dat_lst_list, "~/rajani/diurnal_cycle/projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20.rds")
 #saveRDS(dat_lst_list, "./projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20_temp.rds")
 #################################
 
@@ -122,7 +122,7 @@ library(doParallel)
 
 # Define the file paths for multiple datasets
 # Vector of dataset names and seasons
-datasets <- c("imerg", "gsmap", "cmorph", "persiann", "era5") # Add more datasets if needed
+datasets <- c("imerg", "imergv07", "gsmap", "cmorph", "persiann", "era5") # Add more datasets if needed
 seasons <- c("jja", "djf")
 
 # Initialize an empty vector to store file paths
@@ -261,7 +261,7 @@ dat_lst_list <- lapply(merged_output_list, function(dt) {
   return(dt)
 })
 
-saveRDS(dat_lst_list, "./projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20_seasonal.rds")
+saveRDS(dat_lst_list, "~/rajani/diurnal_cycle/projects/main/data/hourly_mean_all_datasets_LST_glob_2001_20_seasonal.rds")
 
 
 ##################################################################################################
