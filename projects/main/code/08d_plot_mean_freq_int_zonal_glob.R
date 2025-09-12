@@ -30,6 +30,8 @@ zonmean_data_list <- lapply(data_list, function(df) df[, .('no_threshold' = mean
                                                            '0.2' = mean(prec_mean_0.2, na.rm = TRUE),
                                                            '0.5' = mean(prec_mean_0.5, na.rm = TRUE)), by = .(lat, name)])
 
+zonmean_data_list$imerg <- NULL
+
 zonmean_data <- rbindlist(zonmean_data_list)
 to_plot <- melt(zonmean_data,  c("lat", "name"), variable.name = "threshold")
 
@@ -39,7 +41,14 @@ levels(to_plot$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
 
 #zonal_data_comb[precip > 0.4]
 summary(to_plot)
-
+lapply(
+  split(to_plot[threshold == "no threshold"], by = "name"),
+  function(dt) {
+    lapply(dt[, sapply(dt, is.numeric), with = FALSE], function(col) {
+      round(summary(col), 2)
+    })
+  }
+)
 ##flpped x-y axix----
 
 zon_mean <- ggplot(to_plot[threshold == "no threshold"], aes(lat, value, col = name), size = 0.5) + 
@@ -73,6 +82,7 @@ zon_mean <- ggplot(to_plot[threshold == "no threshold"], aes(lat, value, col = n
 #        units = "in", dpi = 600)
 # 
 
+### Frequency----------------
 
 data_list <-  readRDS("./projects/main/data/hourly_freq_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
 
@@ -80,6 +90,7 @@ data_list <-  readRDS("./projects/main/data/hourly_freq_thres_0.1_0.5_all_datase
 zonmean_data_list <- lapply(data_list, function(df) df[, .('0.1' = round(mean(prec_freq, na.rm = TRUE), 2), 
                                                            '0.2' = round(mean(prec_freq_0.2, na.rm = TRUE), 2),
                                                            '0.5' = round(mean(prec_freq_0.5, na.rm = TRUE), 2)), by = .(lat, name)])
+zonmean_data_list$imerg <- NULL
 
 zonmean_data <- rbindlist(zonmean_data_list)
 to_plot <- melt(zonmean_data,  c("lat", "name"), variable.name = "threshold")
@@ -87,18 +98,6 @@ to_plot <- melt(zonmean_data,  c("lat", "name"), variable.name = "threshold")
 
 levels(to_plot$threshold) <- c("0.1 (mm/hr)", "0.2 (mm/hr)", "0.5 (mm/hr)")
 levels(to_plot$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
-
-#zonal_data_comb[precip > 0.4]
-
-# ggplot(to_plot, aes(lat, value, col = name), size = 0.5) + 
-#   geom_line() + 
-#   scale_color_manual(values = line_colors) + 
-#   labs(x = "Latitude", y = "Frequency (%)", col = " ") + 
-#   theme_generic + 
-#   facet_wrap(~threshold) + 
-#   theme(strip.background = element_rect(fill = "white"),
-#         strip.text = element_text(colour = 'Black'))
-
 
 
 ##flpped x-y axix----
@@ -122,14 +121,15 @@ zon_freq <- ggplot(to_plot[threshold == "0.1 (mm/hr)"], aes(lat, value, col = na
 
 
 
- 
+### Intensity----------------
 
 data_list <-  readRDS("./projects/main/data/hourly_int_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
 
 
-zonmean_data_list <- lapply(data_list, function(df) df[, .('0.1' = mean(prec_int, na.rm = TRUE), 
-                                                           '0.2' = mean(prec_int_0.2, na.rm = TRUE),
-                                                           '0.5' = mean(prec_int_0.5, na.rm = TRUE)), by = .(lat, name)])
+zonmean_data_list <- lapply(data_list, function(df) df[, .('0.1' = mean(prec_int, na.rm = FALSE), 
+                                                           '0.2' = mean(prec_int_0.2, na.rm = FALSE),
+                                                           '0.5' = mean(prec_int_0.5, na.rm = FALSE)), by = .(lat, name)])
+zonmean_data_list$imerg <- NULL
 
 zonmean_data <- rbindlist(zonmean_data_list)
 to_plot <- melt(zonmean_data,  c("lat", "name"), variable.name = "threshold")
@@ -182,5 +182,5 @@ p <- ggarrange(zon_mean, zon_freq, zon_int, nrow = 1,  align = "h",
 p
 
 
-ggsave("./projects/main/results/08d_zonal_mean_freq_int_lineplot_glob.png",
+ggsave("./projects/main/results/08d_zonal_mean_freq_int_lineplot_glob_updated.png",
        width = 9.0, height = 5.2, units = "in", dpi = 600)

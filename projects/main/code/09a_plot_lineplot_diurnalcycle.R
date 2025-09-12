@@ -17,7 +17,7 @@ source('./source/themes.R')
 source('./source/palettes.R')
 source('./source/graphics.R')
 
-
+line_colors <- c("#D35C37", "#BF9A77", "#ACBD78", "#4D648D", "#E69F00")
 
 ## read the data sets -------------------------------
 
