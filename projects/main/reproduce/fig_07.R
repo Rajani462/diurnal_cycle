@@ -19,21 +19,38 @@ source('source/graphics.R')
 
 
 ## read the data sets -------------------------------
-peak_hour_list <- readRDS("./projects/main/data/freq_peak_hour_dt_2001_20.RDS")
+peak_hour_list <- readRDS("./projects/main/reproduce/data/freq_peak_hour_dt_2001_20.RDS")
 
-extracted_data_list <- lapply(peak_hour_list, function(df) df[, c("lon", "lat", "time_lst")])
-extracted_data_list <- lapply(peak_hour_list, function(df) {
-  df[, c("lon", "lat", "time_lst")][, time_lst := (hour(time_lst))]
-})
-raster_list <- lapply(extracted_data_list, create_raster) ## Use lapply to create a list of rasters
+# Function to convert UTC to local solar time and extract fractional hour
+library(lubridate)
+convert_to_lst <- function(dt) {
+  dt[, time_lst := time_utc + dhours(lon / 15)]
+  dt[, hour_lst := hour(time_lst) + minute(time_lst)/60 + second(time_lst)/3600]
+  return(dt)
+}
+
+# Apply to each list element
+extracted_data_list2 <- lapply(peak_hour_list, convert_to_lst)
+extracted_data_list <- lapply(extracted_data_list2, function(df) df[, c("lon", "lat", "hour_lst")])
+
+# Use lapply to create a list of rasters
+raster_list <- lapply(extracted_data_list, create_raster)
 raster_brick <- brick(raster_list)
+
 PROJ <- "+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
 rastlist_robin <- projectRaster(raster_brick, crs = PROJ, method="ngb")
-rast_robin_sp <- as(rastlist_robin, "SpatialPixelsDataFrame") # Convert spatial data to data frame
+
+# Convert spatial data to data frame
+rast_robin_sp <- as(rastlist_robin, "SpatialPixelsDataFrame")
 rast_robin_df <- as.data.frame(rast_robin_sp) %>% as.data.table()
+
 to_plot <- melt(rast_robin_df, c("x", "y"), variable.name = "name")
 peak_hour_dt <- to_plot[, .(x, y, peak_hour = value), name]
+
 levels(peak_hour_dt$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
+
+# Create labels for all 24 levels
+blue_red_palette <- viridis_pal(direction = 1)(100)
 
 ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
@@ -54,8 +71,10 @@ ggplot() +
         legend.key.width = unit(1.9, "cm"),
         legend.key.height = unit(0.5, "cm"), 
         legend.spacing = unit(0.1,"cm"),
-        legend.text = element_text(size = 10), 
-        legend.title = element_text(hjust = 0.5, size = 10),
+        #legend.text = element_text(size = 10), 
+        #legend.title = element_text(hjust = 0.5, size = 10),
+        legend.text = element_text(size = 8), 
+        legend.title = element_text(hjust = 0.5, size = 8),
         legend.justification = "center", 
         panel.grid = element_blank(),
         strip.background = element_blank(),

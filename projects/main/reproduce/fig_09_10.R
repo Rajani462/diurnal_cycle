@@ -21,13 +21,12 @@ source('./source/palettes.R')
 source('./source/graphics.R')
 #library(factoextra)
 
-
+line_colors <- c("#D35C37", "#BF9A77", "#ACBD78", "#4D648D", "#E69F00")
 # read the dataset --------------------------------------------------------
-
-processed_data_list <- readRDS("~/rajani/diurnal_cycle/projects/main/reproduce/data/cluster_4_all_dat_parellel_setseed123.RDS")
+processed_data_list <- readRDS("./projects/main/reproduce/data/cluster_4_all_dat_parellel_setseed123.RDS")
+processed_data_list$imerg <- NULL
 
 ##plot
-
 to_plot_list <- lapply(names(processed_data_list), function(name) {
   data_dt <- processed_data_list[[name]]
   to_plot <- data_dt[, .(mean_value = mean(value, na.rm = TRUE), 
@@ -44,21 +43,22 @@ setnames(dat, "dataset_name", "name")
 
 # Define the conditions and update the cluster_name column
 dat[name %in% c("cmorph") & clusters == 1, cluster_name := "Afternoon peak"]
-dat[name %in% c("imerg", "era5") & clusters == 3, cluster_name := "Afternoon peak"]
+dat[name %in% c("imergv07") & clusters == 3, cluster_name := "Mid-night peak"]
+dat[name %in% c("era5") & clusters == 3, cluster_name := "Afternoon peak"]
 dat[name == "persiann" & clusters == 4, cluster_name := "Afternoon peak"]
 
 dat[name %in% c("cmorph", "persiann") & clusters == 3, cluster_name := "Early-morning peak"]
-dat[name == "imerg" & clusters == 4, cluster_name := "Early-morning peak"]
+dat[name == "imergv07" & clusters == 4, cluster_name := "Early-morning peak"]
 dat[name == "era5" & clusters == 2, cluster_name := "Early-morning peak"]
 dat[name == "persiann" & clusters == 1, cluster_name := "Early-morning peak"]
 dat[name %in% c("gsmap") & clusters == 1, cluster_name := "Early-morning peak"]
 
-dat[name %in% c("imerg", "gsmap", "cmorph") & clusters == 2, cluster_name := "Late-morning peak"]
+dat[name %in% c("imergv07", "gsmap", "cmorph") & clusters == 2, cluster_name := "Late-morning peak"]
 dat[name %in% c("gsmap") & clusters == 2, cluster_name := "Afternoon peak"]
 dat[name == "era5" & clusters == 4, cluster_name := "Late-morning peak"]
 dat[name %in% c("gsmap") & clusters == 3, cluster_name := "Late-morning peak"]
 
-dat[name == "imerg" & clusters == 1, cluster_name := "Mid-night peak"]
+dat[name == "imergv07" & clusters == 1, cluster_name := "Afternoon peak"]
 dat[name == "cmorph" & clusters == 4, cluster_name := "Mid-night peak"]
 dat[name == "persiann" & clusters == 3, cluster_name := "Mid-night peak"]
 
@@ -89,7 +89,7 @@ line_plot_nmaed <- ggplot(to_plot_all, aes(hour, mean_value, col = cluster_name,
 
 line_plot_nmaed
 
-ggsave("~/rajani/diurnal_cycle/projects/main/reproduce/results/09_fig_all_data_cluster_4_line_plot_named.png", width = 9.5, height = 5.3, 
+ggsave("~/rajani/diurnal_cycle/projects/main/reproduce/results/09_fig_all_data_cluster_4_line_plot_named_updated.png", width = 9.5, height = 5.3, 
        units = "in", dpi = 600)
 
 
@@ -111,21 +111,22 @@ setnames(dat, "dataset_name", "name")
 
 # Define the conditions and update the cluster_name column
 dat[name %in% c("cmorph") & clusters == 1, cluster_name := "Afternoon peak"]
-dat[name %in% c("imerg", "era5") & clusters == 3, cluster_name := "Afternoon peak"]
+dat[name %in% c("imergv07") & clusters == 3, cluster_name := "Mid-night peak"]
+dat[name %in% c("era5") & clusters == 3, cluster_name := "Afternoon peak"]
 dat[name == "persiann" & clusters == 4, cluster_name := "Afternoon peak"]
 
 dat[name %in% c("cmorph", "persiann") & clusters == 3, cluster_name := "Early-morning peak"]
-dat[name == "imerg" & clusters == 4, cluster_name := "Early-morning peak"]
+dat[name == "imergv07" & clusters == 4, cluster_name := "Early-morning peak"]
 dat[name == "era5" & clusters == 2, cluster_name := "Early-morning peak"]
 dat[name == "persiann" & clusters == 1, cluster_name := "Early-morning peak"]
 dat[name %in% c("gsmap") & clusters == 1, cluster_name := "Early-morning peak"]
 
-dat[name %in% c("imerg", "gsmap", "cmorph") & clusters == 2, cluster_name := "Late-morning peak"]
+dat[name %in% c("imergv07", "gsmap", "cmorph") & clusters == 2, cluster_name := "Late-morning peak"]
 dat[name %in% c("gsmap") & clusters == 2, cluster_name := "Afternoon peak"]
 dat[name == "era5" & clusters == 4, cluster_name := "Late-morning peak"]
 dat[name %in% c("gsmap") & clusters == 3, cluster_name := "Late-morning peak"]
 
-dat[name == "imerg" & clusters == 1, cluster_name := "Mid-night peak"]
+dat[name == "imergv07" & clusters == 1, cluster_name := "Afternoon peak"]
 dat[name == "cmorph" & clusters == 4, cluster_name := "Mid-night peak"]
 dat[name == "persiann" & clusters == 3, cluster_name := "Mid-night peak"]
 
@@ -148,15 +149,15 @@ levels(to_plot_all$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
 data_list_org <- split(to_plot_all, by = 'name') 
 data_list <- lapply(data_list_org, function(df) df[, c("lon", "lat", "clusters", "name")])
 
-imerg <- data_list$IMERG
+imergV07 <- data_list$IMERG
 
 # Assuming your list is named "data_list"
-data_list$PERSIANN <- rbind(data_list$PERSIANN, imerg)
+data_list$PERSIANN <- rbind(data_list$PERSIANN, imergV07)
 data_list$PERSIANN <- unique(data_list$PERSIANN, by = c("lat", "lon"))
 data_list$PERSIANN <- data_list$PERSIANN[name == "IMERG", clusters := NA]
 data_list$PERSIANN[is.na(data_list$PERSIANN$clusters), "name"] <- "PERSIANN"
 
-data_list$CMORPH <- rbind(data_list$CMORPH, imerg)
+data_list$CMORPH <- rbind(data_list$CMORPH, imergV07)
 data_list$CMORPH <- unique(data_list$CMORPH, by = c("lat", "lon"))
 data_list$CMORPH <- data_list$CMORPH[name == "IMERG", clusters := NA]
 data_list$CMORPH[is.na(data_list$CMORPH$clusters), "name"] <- "CMORPH"
@@ -180,7 +181,8 @@ to_plot2 <- to_plot[, .(x, y, clusters = value), name]
 # Define the conditions and update the cluster_name column
 
 to_plot2[name %in% c("CMORPH") & clusters == 1, cluster_name := "Afternoon peak"]
-to_plot2[name %in% c("IMERG", "ERA5") & clusters == 3, cluster_name := "Afternoon peak"]
+to_plot2[name %in% c("IMERG") & clusters == 3, cluster_name := "Mid-night peak"]
+to_plot2[name %in% c("ERA5") & clusters == 3, cluster_name := "Afternoon peak"]
 to_plot2[name == "PERSIANN" & clusters == 4, cluster_name := "Afternoon peak"]
 
 to_plot2[name %in% c("CMORPH", "PERSIANN") & clusters == 3, cluster_name := "Early-morning peak"]
@@ -194,7 +196,7 @@ to_plot2[name %in% c("GSMaP") & clusters == 2, cluster_name := "Afternoon peak"]
 to_plot2[name == "ERA5" & clusters == 4, cluster_name := "Late-morning peak"]
 to_plot2[name %in% c("GSMaP") & clusters == 3, cluster_name := "Late-morning peak"]
 
-to_plot2[name == "IMERG" & clusters == 1, cluster_name := "Mid-night peak"]
+to_plot2[name == "IMERG" & clusters == 1, cluster_name := "Afternoon peak"]
 to_plot2[name == "CMORPH" & clusters == 4, cluster_name := "Mid-night peak"]
 to_plot2[name == "PERSIANN" & clusters == 3, cluster_name := "Mid-night peak"]
 
@@ -220,7 +222,7 @@ spat_plot <- ggplot() +
   coord_fixed(ratio = 1) +
   geom_tile(data = to_plot2, aes(x = x, y = y, fill = cluster_name), alpha = 1) + 
   scale_fill_manual(values = line_colors, breaks = c("Afternoon peak", "Early-afternoon peak", "Early-morning peak", "Late-morning peak", 
-                                                      "Mid-night peak")) + 
+                                                     "Mid-night peak")) + 
   facet_wrap(~name, ncol = 3) + 
   labs(x = NULL, y = NULL, fill = "") + 
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
@@ -238,7 +240,7 @@ spat_plot <- ggplot() +
 
 spat_plot
 
-ggsave("~/rajani/diurnal_cycle/projects/main/reproduce/results/10_fig_all_data_cluster_4_spat_plot_named_robin.png", width = 10.5, height = 5.1, 
+ggsave("~/rajani/diurnal_cycle/projects/main/reproduce/results/10_fig_all_data_cluster_4_spat_plot_named_robin_updated.png", width = 10.5, height = 5.1, 
        units = "in", dpi = 600)
 
 

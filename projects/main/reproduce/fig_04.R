@@ -20,7 +20,7 @@ source('source/graphics.R')
 #### read the data sets -------------------------------
 
 ### Mean------------------------------------------
-data_list <-  readRDS("./projects/main/data/hourly_mean_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
+data_list <-  readRDS("./projects/main/reproduce/data/hourly_mean_thres_0.1_0.5_all_datasets_LST_glob_2001_20.rds")
 data_list$imerg <- NULL
 zonmean_data_list <- lapply(data_list, function(df) df[, .('no_threshold' = mean(prec_mean, na.rm = TRUE), 
                                                            '0.1' = mean(prec_mean_0.1, na.rm = TRUE), 

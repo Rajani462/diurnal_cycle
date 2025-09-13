@@ -17,25 +17,33 @@ source('source/themes.R')
 source('source/palettes.R')
 source('source/graphics.R')
 
-
-## read the data sets -------------------------------
-data_list <- readRDS("~/rajani/diurnal_cycle/projects/main/reproduce/data/hourly_freq_all_datasets_LST_glob_2001_20.rds")
+data_list <- readRDS("./projects/main/reproduce/data/hourly_freq_all_datasets_LST_glob_2001_20.rds")
+data_list$imerg <- NULL
 
 ## Pre-process ----------------------------------------------
+
+### spatial mean plot --------------------------------------
+# spatial mean for each data_list
 mean_data_list <- lapply(data_list, function(df) df[, .(mean_value = round(mean(prec_freq, na.rm = TRUE), 2)), by = .(lat, lon, name)])
 extracted_data_list <- lapply(mean_data_list, function(df) df[, c("lon", "lat", "mean_value")])
-raster_list <- lapply(extracted_data_list, create_raster) # Use lapply to create a list of rasters
+
+# Use lapply to create a list of rasters
+raster_list <- lapply(extracted_data_list, create_raster)
 raster_brick <- brick(raster_list)
+
 PROJ <- "+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
 rastlist_robin <- projectRaster(raster_brick, crs = PROJ)
-rast_robin_sp <- as(rastlist_robin, "SpatialPixelsDataFrame") # Convert spatial data to data frame
+
+# Convert spatial data to data frame
+rast_robin_sp <- as(rastlist_robin, "SpatialPixelsDataFrame")
 rast_robin_df <- as.data.frame(rast_robin_sp) %>% as.data.table()
+
 to_plot <- melt(rast_robin_df, c("x", "y"), variable.name = "name")
 to_plot <- to_plot[, .(x, y, value = round(value, 0), name)]
+
 levels(to_plot$name) <- c("IMERG", "GSMaP", "CMORPH", "PERSIANN", "ERA5")
 
 
-### spatial mean plot --------------------------------------
 ggplot() +
   geom_polygon(data = NE_countries_rob, aes(long, lat, group = group),
                colour = "black", fill = "white", size = 0.25) +
